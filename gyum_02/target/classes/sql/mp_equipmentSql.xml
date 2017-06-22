@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="gyum_02.mp_equipmentSql">
+	<select id="mpEquipmentAllList"
+		resultType="gyum_02.mp_equipment.model.mp_EquipmentDTO"
+		parameterType="HashMap">
+		<![CDATA[ 
+			select
+			    *
+			from
+			    (select
+			        rownum as rnum, a.*
+			    from 
+			        (select
+			           	 equip_idx, equip_code, equip_name, equip_s_size,
+			             equip_first_num, equip_last_num, equip_firstdate
+			        from
+			            equipment
+			        order by
+			            equip_idx asc
+			        )a
+			    )b
+			where rnum>=#{startNum} and rnum<=#{endNum}
+		]]> 
+	</select>
+	
+	<select id="mpEquipmentOneList"
+		resultType="gyum_02.mp_equipment.model.mp_EquipmentDTO"
+		parameterType="HashMap">
+			select
+			   equip_idx, equip_last_num
+			from
+			    equipment
+			where
+			    equip_name = #{equip_name} and
+			    equip_code = #{equip_code} and
+			    equip_s_size = #{equip_s_size}
+	</select>
+	
+	<insert id="mpEquipmentInsertList" 
+		parameterType="gyum_02.mp_equipment.model.mp_EquipmentDTO" >
+		insert into 
+			equipment
+			(equip_idx,
+			equip_name,
+			equip_code,
+			equip_first_num,
+			equip_last_num,
+			equip_firstdate,
+			equip_lastdate,
+			equip_s_size)
+		values(
+            equip_idx.nextval,
+			#{equip_name},
+			#{equip_code},
+		    #{equip_first_num},
+		    #{equip_last_num},
+		    #{equip_lastdate},
+		    #{equip_lastdate},
+		   	#{equip_s_size})
+	</insert>
+	
+	<update id="mpEquipmentUpdateList" parameterType="gyum_02.mp_equipment.model.mp_EquipmentDTO">
+		update
+			equipment
+		set
+			equip_last_num = #{equip_last_num},
+			equip_lastdate = #{equip_lastdate}
+		where 
+			equip_idx = #{equip_idx}
+			
+
+	</update>
+	
+	
+	<insert id="mpEquipmentInsertSalList" 
+		parameterType="gyum_02.mp_equipment.model.mp_EquipmentDTO" >
+		insert into 
+			equipment_sar
+			(e_s_idx,
+			equip_idx,
+			e_s_in_out, 
+			e_s_in_out_num,
+			e_s_modi_date)
+		values(
+            e_s_idx.nextval,
+			#{equip_idx},
+			#{e_s_in_out},
+		    #{e_s_in_out_num},
+		    #{e_s_modi_date}
+		    )
+	</insert>
+	
+	<select id="mpEquipmentDayList"
+		resultType="gyum_02.mp_equipment.model.mp_EquipmentDTO"
+		parameterType="HashMap">
+		<![CDATA[ 
+			select
+			    equipment.equip_idx, equipment.equip_code, equipment.equip_name,
+			    equipment.equip_s_size, equipment.equip_first_num, equipment.equip_last_num,
+			    equipment_sar.e_s_in_out, sum(equipment_sar.e_s_in_out_num) as e_s_in_out_num
+			from 
+			    equipment, equipment_sar
+			where
+				equipment.equip_idx = equipment_sar.equip_idx and
+				to_char(equipment_sar.e_s_modi_date, 'yyyymmdd') = #{e_s_modi_date}
+		]]> 
+			group by 
+                equipment.equip_idx, equipment.equip_code, equipment.equip_name,
+			    equipment.equip_s_size, equipment.equip_first_num, equipment.equip_last_num,
+			    equipment_sar.e_s_in_out
+			
+	</select>
+	
+	<select id="mpEquipmentMonthlyList"
+		resultType="gyum_02.mp_equipment.model.mp_EquipmentDTO"
+		parameterType="HashMap">
+		<![CDATA[ 
+			select
+			    equipment.equip_idx, equipment.equip_code, equipment.equip_name,
+			    equipment.equip_s_size, equipment.equip_first_num, equipment.equip_last_num,
+			    equipment_sar.e_s_in_out, equipment_sar.e_s_in_out_num, equipment_sar.e_s_modi_date
+			from
+			    equipment, equipment_sar
+			where
+			    equipment.equip_idx = equipment_sar.equip_idx and
+			    to_char(equipment_sar.e_s_modi_date, 'yyyy') = #{e_s_modi_date}
+		]]> 
+	</select>
+	
+	<select id="mpEquipmentNameList"
+		resultType="gyum_02.mp_equipment.model.mp_EquipmentDTO">
+		<![CDATA[ 
+			select
+			    equip_idx, equip_name, equip_code, equip_s_size,
+			    equip_s_size, equip_first_num, equip_last_num, 
+			    equip_firstdate, equip_lastdate
+			from
+			    equipment
+		]]> 
+	</select>
+	
+	<select id="mpEquipmentYearlyList"
+		resultType="gyum_02.mp_equipment.model.mp_EquipmentDTO"
+		parameterType="HashMap">
+		<![CDATA[ 
+			select
+			    equipment.equip_idx, equipment.equip_code, equipment.equip_name,
+			    equipment.equip_s_size, equipment.equip_first_num, 
+			    equipment.equip_last_num, equipment_sar.e_s_in_out, 
+			    equipment_sar.e_s_in_out_num, equipment_sar.e_s_modi_date
+			from
+			    equipment, equipment_sar
+			where
+			    equipment.equip_idx = equipment_sar.equip_idx
+			order by
+                to_char(equipment_sar.e_s_modi_date, 'YYYY') asc
+		]]> 
+	</select>
+	
+	<select id="mpEquipmentTotalCnt"
+		resultType="int">
+		<![CDATA[
+			select
+				count(equip_idx)
+			from
+				equipment
+		]]>
+	</select>
+	
+	<select id="mpEquipmentDayTotalCnt" parameterType="HashMap"
+		resultType="int">
+		<![CDATA[
+			select
+				count(e_s_modi_date)
+			from
+				equipment_sar
+			where
+				to_date('#{e_s_modi_date}', 'yyyy') <= e_s_modi_date and
+				e_s_modi_date < to_date('#{e_s_modi_date2}', 'yyyy')
+		]]>
+				
+	</select>
+	
+	<select id="mpEquipmentYearList" parameterType="HashMap"
+		resultType="String">
+		<![CDATA[
+			select
+			    distinct to_char(e_s_modi_date, 'YYYY')
+			from
+			    equipment_sar
+            order by
+                to_char(e_s_modi_date, 'YYYY') asc
+			   
+				
+		]]>
+	</select>
+	
+	
+</mapper>

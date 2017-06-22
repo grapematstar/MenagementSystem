@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="gyum_02.my_score">
+	<select id="my_score_getSchoolScore" parameterType="Map" resultType="gyum_02.my_score.model.my_score_SchoolScoreDTO">
+		select subject_num, s_s_s_term, s_s_s_result 
+		from stu_sch_score
+		where stu_idx = #{stu_idx} and s_s_s_year = #{s_s_s_year}
+	</select>
+	<select id="my_score_school_getSubjectScore" parameterType="Map" resultType="gyum_02.my_score.model.my_score_SchoolScoreDTO">
+		select s_s_s_year, s_s_s_term, s_s_s_result
+		from stu_sch_score
+		where stu_idx = #{stu_idx} and subject_num = #{subject_num} and s_s_s_year <![CDATA[<=]]> #{endyear} and s_s_s_year <![CDATA[>=]]> #{startyear}
+	</select>
+	<select id="my_score_getSchoolScore_oneterm" parameterType="Map" resultType="gyum_02.my_score.model.my_score_SchoolScoreDTO">
+		select subject_num, s_s_s_result 
+		from stu_sch_score
+		where stu_idx = #{stu_idx} and s_s_s_year = #{s_s_s_year} and s_s_s_term = #{s_s_s_term}
+	</select>
+	<select id="my_score_school_getGoal" parameterType="Map" resultType="gyum_02.my_score.model.my_score_SchoolGoalDTO">
+		select subject_num, s_s_g_goal
+		from stu_sch_goal
+		where stu_idx = #{stu_idx} and s_s_g_year = #{s_s_g_year} and s_s_g_term = #{s_s_g_term}
+	</select>
+	<select id="my_score_school_getSubjectGoal" parameterType="Map" resultType="gyum_02.my_score.model.my_score_SchoolGoalDTO">
+		select s_s_g_year, s_s_g_term, s_s_g_goal
+		from stu_sch_goal
+		where stu_idx = #{stu_idx} and subject_num = #{subject_num} and s_s_g_year <![CDATA[<=]]> #{endyear} and s_s_g_year <![CDATA[>=]]> #{startyear}
+	</select>
+	<select id="my_parent_getStudentIdx" parameterType="Map" resultType="Integer">
+		select stu_idx 
+		from student
+		where par_idx = #{par_idx}
+	</select>
+	<select id="my_teacher_getTeacherName" parameterType="Map" resultType="String">
+		select tea_name
+		from teacher
+		where tea_idx = #{tea_idx}
+	</select>
+	<insert id="my_score_setSchoolScore" parameterType="gyum_02.my_score.model.my_score_SchoolScoreDTO">
+		insert into stu_sch_score
+		values(#{stu_idx},#{subject_num},#{s_s_s_year},#{s_s_s_term},#{s_s_s_result})
+	</insert>
+	<select id="my_score_checkSchoolScoreDB" parameterType="gyum_02.my_score.model.my_score_SchoolScoreDTO" resultType="Integer">
+		select count(*)
+		from stu_sch_score
+		where stu_idx = #{stu_idx} and subject_num = #{subject_num}
+			and s_s_s_year = #{s_s_s_year} and s_s_s_term = #{s_s_s_term}
+	</select>
+	<select id="my_score_checkSchoolGoal" parameterType="gyum_02.my_score.model.my_score_SchoolGoalDTO" resultType="Integer">
+		select count(*)
+		from stu_sch_goal
+		where stu_idx = #{stu_idx} and subject_num = #{subject_num}
+			and s_s_g_year = #{s_s_g_year} and s_s_g_term = #{s_s_g_term}	
+	</select>
+	<insert id="my_score_setSchoolGoal" parameterType="gyum_02.my_score.model.my_score_SchoolGoalDTO">
+		insert into stu_sch_goal
+		values(#{stu_idx},#{subject_num},#{s_s_g_year},#{s_s_g_term},#{s_s_g_goal})	
+	</insert>
+	<update id="my_score_modiSchoolGoal" parameterType="gyum_02.my_score.model.my_score_SchoolGoalDTO">
+		update stu_sch_goal
+		set s_s_g_goal = #{s_s_g_goal}
+		where stu_idx = #{stu_idx} and subject_num = #{subject_num}
+			and s_s_g_year = #{s_s_g_year} and s_s_g_term = #{s_s_g_term}
+	</update>
+	<update id="my_score_modiSchoolScore" parameterType="gyum_02.my_score.model.my_score_SchoolScoreDTO">
+		update stu_sch_score
+		set s_s_s_result = #{s_s_s_result}
+		where stu_idx = #{stu_idx} and subject_num = #{subject_num}
+			and s_s_s_year = #{s_s_s_year} and s_s_s_term = #{s_s_s_term}
+	</update>
+	<select id="my_score_getStudentScoreList" parameterType="Map" resultType="gyum_02.my_score.model.my_score_StudentScoreDTO">
+		select s_s_result, s_s_date
+		from stu_score
+		where stu_idx = #{stu_idx} and class_idx = #{class_idx}
+		order by s_s_date asc
+	</select>
+	<select id="my_teacher_getStudentScoreDate" parameterType="Map" resultType="Integer">
+		select distinct(s_s_date)
+		from stu_score
+		where class_idx = #{class_idx}
+		order by s_s_date asc
+	</select>
+	<select id="my_teacher_getAllStudentScoreInfo" parameterType="Map" resultType="gyum_02.my_score.model.my_score_StudentScoreDTO">
+		select class_idx, stu_score.stu_idx as stu_idx, s_s_result, s_s_date 
+		from stu_score, student
+		where stu_score.class_idx = #{class_idx} and stu_score.stu_idx = student.stu_idx
+		order by stu_name asc, s_s_date asc
+	</select>
+</mapper>

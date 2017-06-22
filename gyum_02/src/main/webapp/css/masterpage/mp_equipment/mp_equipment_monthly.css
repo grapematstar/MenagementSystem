@@ -1,0 +1,32 @@
+@CHARSET "UTF-8";
+#span_monthly_do{
+	border:2px solid #918c8c;
+}
+.div_search{
+	padding-left:50px;
+	padding-bottom:10px;
+}
+#select_year, #select_chart, #select_e_s_in_out{
+	margin-right:4px;
+}
+.div_search input{
+	width:100px;
+	vertical-align: top;
+}
+.x_panel{
+	width:800px;
+	margin-left:40px;
+	margin-bottom:20px;
+}
+#div_chart{
+
+}
+#canvas_line_chart, #canvas_bar_chart{
+
+}
+#div_chart{
+}
+#table_equipment{
+	width:900px;
+	margin-bottom:200px;
+}

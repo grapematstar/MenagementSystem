@@ -1,0 +1,71 @@
+@CHARSET "UTF-8";
+.div_top{
+	width:100%;
+	font-size:12px;
+}
+.div_top a{
+	text-decoration: none;
+	color:#918c8c;
+}
+#div_teacher{
+	width:600px;
+	font-size:12px;
+	margin-left:130px;
+}
+#span_teacher_do{
+	border:2px solid #918c8c;
+}
+.table_teacher{
+	width:100%;
+	height:200px;
+	background:#fafafa;
+	margin-bottom:10px;
+}
+.td_teacher_img{
+	width:200px;
+	padding:0px;
+}
+.td_teacher_img img{
+	width:180px;
+	height:180px;
+	margin:0px auto;
+	padding:0px;
+}
+.table_teacher td+td{
+	height:100%;
+	padding:0px;
+}
+.ul_content{
+	text-align:left;
+	border:1px solid #ffffff;
+	padding:0px;
+	margin:0px;
+	width:100%;
+	height:100%;
+}
+.li_tea_id{
+	text-indent:10px;
+	font-size:18px;
+	padding:4px;
+}
+.li_tea_name{
+	text-indent:10px;
+	font-size:14px;
+	padding:4px;
+}
+.li_tea_in_date{
+	text-indent:12px;
+	font-size:12px;
+}
+.li_tea_email{
+	text-indent:10px;
+	font-size:14px;
+}
+.li_tea_tel{
+	text-indent:10px;
+	font-size:14px;
+}
+.label_tea{
+	width:110px;
+	padding:4px;
+}

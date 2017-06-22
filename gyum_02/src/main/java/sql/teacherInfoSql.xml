@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="gyum.teacherInfo">
+	<select id="teacherGetTotal" parameterType="Map" resultType="int" >
+		select count(*)
+		from teacher
+		where tea_in_date = tea_out_date
+			and
+			  subject_num = #{sub}
+	</select>
+	
+	<select id="teacherList" parameterType="Map" resultType="gyum_02.member.model.My_memberTeacherDTO">
+		select * 
+		from teacher
+		where tea_in_date = tea_out_date
+		  	and 
+		  	  subject_num = #{sub} 
+		order by tea_idx asc
+	</select>
+	
+	<select id="teacherInfoCon" resultType="gyum_02.member.model.My_memberTeacherDTO">
+		select teacher.*, subject_num.subject_name
+		from teacher, subject_num
+		where teacher.subject_num = subject_num.subject_num
+			and
+			  teacher.tea_idx = #{idx}
+	</select>
+	
+	<select id="classInfoCon" parameterType="Map" resultType="gyum_02.mypage.model.My_ClassDTO">
+		select *
+		from (select class.*, class_check.class_check
+		      from class, class_check
+		      where class.class_idx = class_check.class_idx)a
+		where a.class_check = 1
+		    and
+		      a.class_enddate<![CDATA[>=]]>#{nowdate}
+		    and
+		      a.tea_idx = #{idx}
+	</select>
+
+	<select id="lastclassInfoCon" parameterType="Map" resultType="gyum_02.mypage.model.My_ClassDTO">
+		select *
+		from (select class.*, class_check.class_check
+		      from class, class_check
+		      where class.class_idx = class_check.class_idx)a
+		where a.class_check = 1
+		    and
+		      a.class_enddate<![CDATA[<]]>#{nowdate}
+		    and
+		      a.tea_idx = #{idx}
+	</select>
+	
+	<select id="lastclass_review" parameterType="Map" resultType="gyum_02.cybercampus.Model.CC_EpilogueDTO">
+		select *
+		from (select rownum as rnum, a.*
+			  from (select class_review.*, class.class_subject
+					  from class_review, class
+					 where class.class_idx = class_review.class_idx
+					 	and
+					 		class_review.class_idx in
+								<foreach item="list" index="index" collection="list" open="(" separator="," close=")">
+									#{list.class_idx}
+								</foreach>
+					  order by class_review.c_r_writedate desc
+					)a
+			  )b
+		where rnum<![CDATA[>=]]>#{startnum}
+		  and rnum<![CDATA[<=]]>#{endnum}
+	</select>
+
+	<select id="lastclass_reviewTotal" parameterType="Map" resultType="int">
+		select count(*)
+		from class_review
+		where class_idx in
+			<foreach item="list" index="index" collection="list" open="(" separator="," close=")">
+				#{list.class_idx}
+			</foreach>
+	</select>
+	
+	<select id="nowclassinfo" resultType="gyum_02.mypage.model.My_ClassDTO">
+		select class.*, teacher.tea_name, subject_num.subject_name
+		from class, subject_num, teacher
+		where class.subject_num = subject_num.subject_num
+		    and
+		      class.tea_idx = teacher.tea_idx
+		    and
+		      class_idx = #{idx}
+		order by class_idx desc
+	</select>
+	
+	<select id="nowepilCon" parameterType="Map" resultType="gyum_02.cybercampus.Model.CC_EpilogueDTO">
+		select *
+		from (select rownum as rnum, a.*
+			  from (select *
+					  from class_review
+					 where class_idx = #{idx}
+					  order by c_r_writedate desc
+					)a
+			  )b
+		where rnum<![CDATA[>=]]>#{startnum}
+		  and rnum<![CDATA[<=]]>#{endnum}
+
+	</select>
+	
+	<select id="nowepilGetTotal" resultType="int">
+		select count(*)
+		from class_review
+		where class_idx = #{idx}
+	</select>
+</mapper>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="gyum.notice">
+	<select id="notice_List" parameterType="Map"
+		resultType="gyum_02.notice.model.NoticeDTO">
+		select *
+		from (select rownum as rnum,a.*
+				from (select *
+						from notice
+					order by notice_idx desc)a
+				)b
+		where rnum<![CDATA[>=]]>#{startnum}
+			and rnum<![CDATA[<=]]>#{endnum}
+	</select>
+	
+	<select id="t_n_List" parameterType="Map"
+		resultType="gyum_02.notice.model.Teacher_NoticeDTO">
+		select *
+		from (select rownum as rnum,a.*
+				from (select *
+						from teacher_notice
+					order by t_n_idx desc)a
+				)b
+		where rnum<![CDATA[>=]]>#{startnum}
+			and rnum<![CDATA[<=]]>#{endnum}
+	</select>
+
+	<select id="notice_GetTotal" resultType="int">
+		select count(*) from notice
+	</select>
+
+	<select id="t_n_GetTotal" resultType="int">
+		select count(*) from teacher_notice
+	</select>
+
+	<insert id="notice_Write" parameterType="gyum_02.notice.model.NoticeDTO">
+		insert into notice
+		values(notice_notice_idx.nextval, #{notice_subject}, #{notice_content}, sysdate)
+	</insert>
+	
+	<insert id="t_n_Write" parameterType="gyum_02.notice.model.Teacher_NoticeDTO">
+		insert into teacher_notice
+		values(teacher_notice_t_n_idx.nextval, #{t_n_subject}, #{t_n_content}, sysdate)
+	</insert>
+
+	<select id="notice_Con" parameterType="int"
+		resultType="gyum_02.notice.model.NoticeDTO">
+		select *
+		from notice
+		where notice_idx=#{notice_idx}
+	</select>
+
+	<select id="t_n_Con" parameterType="int"
+		resultType="gyum_02.notice.model.Teacher_NoticeDTO">
+		select *
+		from teacher_notice
+		where t_n_idx=#{t_n_idx}
+	</select>
+
+	<delete id="notice_Del" parameterType="int">
+		delete notice
+		where notice_idx=#{notice_idx}
+	</delete>
+	
+	<delete id="t_n_Del" parameterType="int">
+		delete t_notice
+		where t_n_idx=#{t_n_idx}
+	</delete>
+
+	<update id="notice_Update" parameterType="gyum_02.notice.model.NoticeDTO">
+		update notice set
+		notice_subject=#{notice_subject}, notice_content=#{notice_content}, notice_writedate=sysdate
+		where notice_idx = #{notice_idx}
+	</update>
+	
+	<update id="t_n_Update" parameterType="gyum_02.notice.model.Teacher_NoticeDTO">
+		update teacher_notice set
+		t_n_subject=#{t_n_subject}, t_n_content=#{t_n_content}, t_n_writedate=sysdate
+		where t_n_idx = #{t_n_idx}
+	</update>
+</mapper>

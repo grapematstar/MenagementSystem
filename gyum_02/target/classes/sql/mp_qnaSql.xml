@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="gyum_02.mp_qnaSql">
+	<!-- Q & A -->
+	
+	<select id="mpQnaAllList"
+		resultType="gyum_02.mp_qnaManagement.model.mp_QnaDTO"
+		parameterType="HashMap">
+		<![CDATA[ 
+		select
+		    *
+		from
+		    (select
+		        rownum as rnum, b.*
+		    from 
+		        (select
+                    qna.qna_idx, qna.qna_subject, qna.qna_content, qna.qna_writedate,
+		            qna.qna_writer, qna_kind.q_k_kind, qna.qna_reply
+		        from
+		            qna, qna_kind,
+                    (select
+                        min(qna_writedate) as wd, qna_idx
+                    from
+                        qna
+                    group by
+                        qna_idx)a
+				where
+					qna.q_k_idx = qna_kind.q_k_idx and
+					qna.qna_reply = 0 and
+					a.wd = qna.qna_writedate
+		        )b
+		    )c
+		where
+			rnum>=#{startNum} and
+			rnum<=#{endNum}
+		]]> 
+	</select>
+	<select id="mpQnaContent"
+		resultType="gyum_02.mp_qnaManagement.model.mp_QnaDTO"
+		parameterType="int">
+		<![CDATA[ 
+		select
+		    qna.qna_idx, qna.qna_subject, qna.qna_writer, qna.qna_writedate, 
+		    qna_kind.q_k_kind, qna.qna_reply, qna.qna_content
+		from
+		    qna, qna_kind
+		where
+		    qna.q_k_idx = qna_kind.q_k_idx and
+		    qna.qna_idx = #{qna_idx}
+		order by
+			qna.qna_writedate asc
+			
+		]]> 
+	</select>
+	
+	<delete id="mpQnaDelete" parameterType="HashMap">
+		delete
+	    from
+	        qna
+	    where
+	        qna_writedate =
+	        (select
+	            qna_writedate
+			from
+				(select
+					rownum as rnum, a.*
+			    from
+			        (select
+				       *
+			        from
+						qna
+					where
+						qna_idx like #{qna_idx}
+			        order by 
+			            qna_writedate asc)a
+		       )b
+			<if test="qna_row != null">
+			where
+			    rnum = #{qna_row}
+			</if>
+			)
+	</delete>
+	
+	<insert id="mpQnaReWrite" 
+		parameterType="gyum_02.mp_qnaManagement.model.mp_QnaDTO" >
+		insert into 
+			qna
+		values(
+			#{qna_idx},
+			#{qna_subject},
+		    #{qna_content},
+		    sysdate,
+		    (select
+                q_k_idx
+            from
+                qna_kind
+            where
+                qna_kind.q_k_kind = #{q_k_kind}),
+		   	1,
+		   	#{qna_writer}
+			)
+	</insert>
+	
+	
+	<select id="mpQnaTotalCnt" resultType="int">
+		<![CDATA[ 
+		select
+         count(qna_idx)
+      from
+         qna
+      where
+         qna_reply = 0
+		]]> 
+	</select>
+
+</mapper>

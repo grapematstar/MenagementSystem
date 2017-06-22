@@ -1,0 +1,5 @@
+1.cyberclass가 생성되는 시점에 학습자료에 해당하는 repository가 그 해당 강의코드에 맞춰 생성되어야 한다.
+2.repo,onlinequiz,survey 재설계
+3.DTO,DAO 일요일 밤에 설계
+4.후기게시판의 경우는 AJAX로 모든것 처리
+5.강사랑 학생을 나눠서 조지자.

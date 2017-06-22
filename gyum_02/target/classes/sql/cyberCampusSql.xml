@@ -1,0 +1,585 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="gyum_02.cybercampus">
+<!-- CYBERCAMPUS TEACHER NOTICE -->
+<select id="cc_TeacherNoticeContent" parameterType="Integer" resultType="gyum_02.cybercampus.Model.CC_TeacherNoticeDTO">
+	SELECT T_N_IDX, T_N_SUBJECT, T_N_CONTENT, TO_TIMESTAMP(TO_CHAR(T_N_WRITEDATE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS T_N_WRITEDATE FROM TEACHER_NOTICE WHERE T_N_IDX=#{t_n_idx} 
+</select>
+<!-- CYBERCAMPUS INDEX PART -->
+<select id="cc_indexTeacherNoticeList" resultType="gyum_02.cybercampus.Model.CC_TeacherNoticeDTO">
+	<![CDATA[SELECT * FROM (SELECT ROWNUM AS RNUM, TNOTICE.* FROM (SELECT T_N_IDX, T_N_SUBJECT, T_N_CONTENT,
+	TO_TIMESTAMP(TO_CHAR(T_N_WRITEDATE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS T_N_WRITEDATE
+	FROM TEACHER_NOTICE ORDER BY T_N_IDX DESC)TNOTICE)TEACHERNOTICE WHERE RNUM<=4]]>
+</select>
+<select id="cc_indexNoticeList" resultType="gyum_02.cybercampus.Model.CC_NoticeDTO" parameterType="Integer">
+	<![CDATA[SELECT BTAB.C_N_IDX, BTAB.CLUB_IDX, BTAB.C_N_WRITER, BTAB.C_N_SUBJECT, BTAB.C_N_CONTENT, BTAB.FILE_IDX, BTAB.C_N_READNUM,
+	TO_TIMESTAMP(TO_CHAR(BTAB.C_N_WRITEDATE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS C_N_WRITEDATE
+	FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (SELECT * FROM CLUB_NOTICE WHERE CLUB_IDX=#{club_idx} ORDER BY C_N_IDX DESC)ATAB)BTAB WHERE RNUM<=4]]>
+</select>
+<select id="cc_indexFreeBBSList" resultType="gyum_02.cybercampus.Model.CC_FreeBBSDTO" parameterType="Integer">
+	<![CDATA[SELECT BTAB.C_F_B_IDX, BTAB.CLUB_IDX, BTAB.C_F_B_WRITER, BTAB.C_F_B_SUBJECT, BTAB.C_F_B_CONTENT,
+	TO_TIMESTAMP(TO_CHAR(BTAB.C_F_B_WRITEDATE,'YYYY-MM-DD HH24:MI:SS')) AS C_F_B_WRITEDATE FROM (SELECT ROWNUM AS RNUM, ATAB.*
+	FROM (SELECT * FROM CLUB_FREE_BBS WHERE CLUB_IDX=#{club_idx} ORDER BY C_F_B_IDX DESC)ATAB)BTAB WHERE RNUM<=4]]>
+</select>
+<select id="cc_indexRepositoryList" resultType="gyum_02.cybercampus.Model.CC_RepositoryDTO" parameterType="Integer">
+<![CDATA[SELECT * FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM
+	(SELECT CLUB_HOMEWORK_TEACHER.C_H_T_IDX, CLUB_HOMEWORK_TEACHER.C_H_T_SUBJECT, TO_TIMESTAMP(TO_CHAR(CLUB_HOMEWORK_TEACHER.C_H_T_STARTDATE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS C_H_T_STARTDATE,
+	TO_TIMESTAMP(TO_CHAR(CLUB_HOMEWORK_TEACHER.C_H_T_ENDDATE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS C_H_T_ENDDATE, TO_TIMESTAMP(TO_CHAR(CLUB_HOMEWORK_TEACHER.C_H_T_DEADLINE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS C_H_T_DEADLINE, TO_TIMESTAMP(TO_CHAR(CLUB_HOMEWORK_TEACHER.C_H_T_WRITEDATE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS C_H_T_WRITEDATE,TEACHER.TEA_NAME
+	FROM CLUB_HOMEWORK_TEACHER, CLASS, TEACHER WHERE CLUB_HOMEWORK_TEACHER.CLASS_IDX=CLASS.CLASS_IDX
+	AND CLASS.TEA_IDX=TEACHER.TEA_IDX AND CLUB_HOMEWORK_TEACHER.CLASS_IDX=#{class_idx} ORDER BY CLUB_HOMEWORK_TEACHER.C_H_T_IDX DESC)ATAB)BTAB WHERE RNUM<=4]]>
+</select>
+<!-- CYBERCAMPUS SEARCH SQL -->
+<select id="cc_totalSearchNoticeForThisUser" parameterType="Map" resultType="int">
+SELECT COUNT(C_N_IDX) FROM CLUB_NOTICE WHERE CLUB_IDX=#{class_idx}
+<choose>
+	<when test="searchHow=='subject'">
+		AND C_N_SUBJECT LIKE '%'||#{searchWhat}||'%'
+	</when>
+	<when test="searchHow=='content'">
+		AND C_N_CONTENT LIKE '%'||#{searchWhat}||'%'
+	</when>
+	<when test="searchHow=='subjectNcontent'">
+		AND C_N_SUBJECT LIKE '%'||#{searchWhat}||'%' OR C_N_CONTENT LIKE '%'||#{searchWhat}||'%'
+	</when>
+</choose>
+</select>
+<select id="cc_searchNoticeForThisUser" parameterType="Map" resultType="gyum_02.cybercampus.Model.CC_NoticeDTO">
+	SELECT BTAB.* FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (SELECT CLUB_NOTICE.C_N_IDX, CLUB_NOTICE.CLUB_IDX, CLUB_NOTICE.C_N_WRITER, CLUB_NOTICE.C_N_SUBJECT, CLUB_NOTICE.C_N_CONTENT,CLUB_NOTICE.FILE_IDX, CLUB_NOTICE.C_N_WRITEDATE
+	FROM CLUB_NOTICE WHERE CLUB_IDX=#{class_idx}
+	<choose>
+	<when test="searchHow=='subject'">
+		AND C_N_SUBJECT LIKE '%'||#{searchWhat}||'%'
+	</when>
+	<when test="searchHow=='content'">
+		AND C_N_CONTENT LIKE '%'||#{searchWhat}||'%'
+	</when>
+	<when test="searchHow=='subjectNcontent'">
+		AND C_N_SUBJECT LIKE '%'||#{searchWhat}||'%' OR C_N_CONTENT LIKE '%'||#{searchWhat}||'%'
+	</when>
+</choose>
+	ORDER BY C_N_IDX DESC)ATAB)BTAB
+	WHERE RNUM<![CDATA[>=]]>#{startnum} AND RNUM<![CDATA[<=]]>#{endnum}
+</select>
+<select id="cc_totalCntSearchFreeBBSForThisUser" parameterType="Map" resultType="Integer">
+	SELECT COUNT(C_F_B_IDX) FROM CLUB_FREE_BBS WHERE CLUB_IDX=#{class_idx}
+<choose>
+	<when test="searchHow=='subject'">
+		AND C_F_B_SUBJECT LIKE '%'||#{searchWhat}||'%'
+	</when>
+	<when test="searchHow=='content'">
+		AND C_F_B_CONTENT LIKE '%'||#{searchWhat}||'%'
+	</when>
+	<when test="searchHow=='subjectNcontent'">
+		AND C_F_B_SUBJECT LIKE '%'||#{searchWhat}||'%' OR C_F_B_CONTENT LIKE '%'||#{searchWhat}||'%'
+	</when>
+	<when test="searchHow=='writer'">
+		AND C_F_B_WRITER LIKE '%'||#{searchWhat}||'%'
+	</when>
+</choose>
+</select>
+<select id="cc_searchFreeBBSForThisUser" parameterType="Map" resultType="gyum_02.cybercampus.Model.CC_FreeBBSDTO">
+	SELECT BTAB.C_F_B_IDX, BTAB.CLUB_IDX, BTAB.C_F_B_WRITER, BTAB.C_F_B_SUBJECT, BTAB.C_F_B_CONTENT, TO_TIMESTAMP(TO_CHAR(BTAB.C_F_B_WRITEDATE,'YYYY-MM-DD HH24:MI:SS')) AS C_F_B_WRITEDATE FROM
+	(SELECT ROWNUM AS RNUM, ATAB.* FROM
+	(SELECT * FROM CLUB_FREE_BBS WHERE CLUB_IDX=#{class_idx}
+<choose>
+	<when test="searchHow=='subject'">
+		AND C_F_B_SUBJECT LIKE '%'||#{searchWhat}||'%'
+	</when>
+	<when test="searchHow=='content'">
+		AND C_F_B_CONTENT LIKE '%'||#{searchWhat}||'%'
+	</when>
+	<when test="searchHow=='subjectNcontent'">
+		AND C_F_B_SUBJECT LIKE '%'||#{searchWhat}||'%' OR C_F_B_CONTENT LIKE '%'||#{searchWhat}||'%'
+	</when>
+	<when test="searchHow=='writer'">
+		AND C_F_B_WRITER LIKE '%'||#{searchWhat}||'%'
+	</when>
+</choose>
+	ORDER BY C_F_B_IDX DESC)ATAB)BTAB
+	WHERE RNUM<![CDATA[>=]]>#{startnum} AND RNUM<![CDATA[<=]]>#{endnum}
+</select>
+<!-- CYBERCAMPUS SADNESS SQL -->
+<select id="cc_getClassSubjectName" parameterType="int" resultType="String">
+	SELECT CLASS.CLASS_SUBJECT FROM CLASS WHERE CLASS.CLASS_IDX=#{class_idx}
+</select>
+<select id="cc_callClassSubject" parameterType="int" resultType="String">
+	SELECT CLASS_SUBJECT FROM CLASS WHERE CLASS_IDX=#{class_idx}
+</select>
+<select id="cc_sessionClassInfo" parameterType="int" resultType="gyum_02.cybercampus.Model.CC_ClassDTO">
+	SELECT CLASS.CLASS_IDX,CLASS.SUBJECT_NUM,CLASS.CLASS_STARTDATE,CLASS.CLASS_ENDDATE,CLASS.CLASSROOM,
+	CLASS.CLASS_DAY,CLASS.CLASS_TIME,CLASS.CLASS_SUBJECT,CLASS.TEA_IDX,CLASS.CLASS_PRICE,CLASS.CLASS_MAX_STUDENT,
+	CLASS_NUM.CLASS_NUM,TEACHER.TEA_NAME,TEACHER.TEA_ID,TEACHER.TEA_TEL,TEACHER.TEA_EMAIL
+	FROM CLASS, CLASS_NUM,TEACHER WHERE CLASS.SUBJECT_NUM=CLASS_NUM.SUBJECT_IDX AND CLASS.TEA_IDX=TEACHER.TEA_IDX
+	AND CLASS.CLASS_IDX=#{class_idx}
+</select>
+<!-- CYBERCAMPUS NOTICE -->
+<select id="cc_totalCntNoticeList" parameterType="int" resultType="int">
+	SELECT COUNT(*) FROM CLUB_NOTICE WHERE CLUB_IDX=#{club_idx} ORDER BY C_N_IDX DESC
+</select>
+<insert id="cc_submitNoticeWrite" parameterType="gyum_02.cybercampus.Model.CC_NoticeDTO">
+	INSERT INTO CLUB_NOTICE VALUES(CLUB_NOTICE_C_N_IDX.NEXTVAL,#{club_idx},#{c_n_writer},#{c_n_subject},#{c_n_content},1,0,SYSDATE)</insert>
+<select id="cc_gotoNoticeList" parameterType="MAP" resultType="gyum_02.cybercampus.Model.CC_NoticeDTO">
+	<![CDATA[SELECT BTAB.C_N_IDX, BTAB.CLUB_IDX, BTAB.C_N_WRITER, BTAB.C_N_SUBJECT, BTAB.C_N_CONTENT, BTAB.FILE_IDX, BTAB.C_N_READNUM,
+	TO_TIMESTAMP(TO_CHAR(BTAB.C_N_WRITEDATE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS C_N_WRITEDATE
+	FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (SELECT * FROM CLUB_NOTICE WHERE CLUB_IDX=#{club_idx} ORDER BY C_N_IDX DESC)ATAB)BTAB
+	WHERE RNUM>=#{startnum} AND RNUM<=#{endnum}]]>
+</select>
+<select id="cc_gotoNoticeContent" parameterType="int" resultType="gyum_02.cybercampus.Model.CC_NoticeDTO">
+	SELECT * FROM CLUB_NOTICE WHERE C_N_IDX=#{c_n_idx}
+</select>
+<update id="cc_submitNoticeUpdate" parameterType="gyum_02.cybercampus.Model.CC_NoticeDTO">
+	UPDATE CLUB_NOTICE SET C_N_SUBJECT=#{c_n_subject}, C_N_CONTENT=#{c_n_content}, C_N_WRITEDATE=SYSDATE WHERE C_N_IDX=#{c_n_idx}
+</update>
+<delete id="cc_submitNoticeDelete" parameterType="int">
+	DELETE CLUB_NOTICE WHERE C_N_IDX=#{c_n_idx}</delete>
+<!-- CYBERCAMPUS INFOPLAN -->
+<!-- INFO -->
+<insert id="cc_submitInfoPlanWrite" parameterType="gyum_02.cybercampus.Model.CC_InfoPlanDTO">
+	INSERT INTO CLUB_INFO_PLAN
+	VALUES(CLUB_INFO_PLAN_C_I_P_IDX.NEXTVAL,#{club_idx},#{tea_idx},#{subject_num},#{c_i_p_startdate},#{c_i_p_enddate},#{c_i_p_purpose},#{c_i_p_overview},#{c_i_p_writedate})
+</insert>
+<select id="cc_gotoInfoPlanContent" parameterType="int" resultType="gyum_02.cybercampus.Model.CC_InfoPlanDTO">
+	SELECT CLUB_INFO_PLAN.*, CLASS.CLASS_STARTDATE, CLASS.CLASS_ENDDATE, TEACHER.TEA_NAME, CLASS_NUM.CLASS_NUM FROM CLUB_INFO_PLAN,CLASS,CLASS_NUM,TEACHER
+	WHERE CLUB_IDX=#{club_idx} AND CLUB_INFO_PLAN.CLUB_IDX=CLASS.CLASS_IDX AND CLASS.SUBJECT_NUM=CLASS_NUM.SUBJECT_IDX AND CLASS.TEA_IDX=TEACHER.TEA_IDX
+</select>
+<update id="cc_submitInfoPlanUpdate" parameterType="gyum_02.cybercampus.Model.CC_InfoPlanDTO">
+	UPDATE CLUB_INFO_PLAN
+	SET C_I_P_STARTDATE=#{c_i_p_startdate}, C_I_P_ENDDATE=#{c_i_p_enddate}, C_I_P_PURPOSE=#{c_i_p_purpose}, C_I_P_OVERVIEW=#{c_i_p_overview}, C_I_P_WRITEDATE=#{c_i_p_writedate}
+	WHERE C_I_P_IDX=#{c_i_p_idx}
+</update>
+<!-- PLAN -->
+<insert id="cc_submitPlanWrite" parameterType="gyum_02.cybercampus.Model.CC_PlanDTO">
+	INSERT INTO CLUB_PLAN
+	VALUES(CLUB_PLAN_C_PLAN_IDX.NEXTVAL,#{c_i_p_idx},#{c_plan_unit},#{c_plan_content})
+</insert>
+<select id="cc_gotoPlanContent" parameterType="int" resultType="gyum_02.cybercampus.Model.CC_PlanDTO">
+	SELECT *
+	FROM CLUB_PLAN
+	WHERE C_I_P_IDX=#{club_idx}
+</select>
+<update id="cc_submitPlanUpdate" parameterType="gyum_02.cybercampus.Model.CC_PlanDTO">
+	UPDATE CLUB_PLAN
+	SET C_PLAN_UNIT=#{c_plan_unit}, C_PLAN_CONTENT=#{c_plan_content}
+	WHERE C_I_P_IDX=#{c_i_p_idx}
+</update>
+<!-- CYBERCAMPUS ATTEND -->
+<update id="cc_submitSingleStudentScoreUpdate" parameterType="gyum_02.cybercampus.Model.CC_AttendDTO">
+	UPDATE STU_SCORE
+	SET S_S_RESULT=#{s_s_result}
+	WHERE STU_IDX=#{stu_idx} AND S_S_DATE=#{s_s_date}
+</update>
+<select id="cc_selectSingleStudentName" parameterType="gyum_02.cybercampus.Model.CC_AttendDTO">
+	SELECT STU_NAME FROM STUDENT
+	WHERE STU_IDX=#{stu_idx}
+</select>
+<select id="cc_countOneAttendWrite" parameterType="gyum_02.cybercampus.Model.CC_AttendDTO" resultType="int">
+	SELECT COUNT(STU_IDX) FROM ATTEND WHERE CLASS_IDX=#{class_idx} AND STU_IDX=#{stu_idx} AND ATTEND_DATE=#{attend_date}
+</select>
+<insert id="cc_submitOneAttendWrite" parameterType="gyum_02.cybercampus.Model.CC_AttendDTO">
+	INSERT INTO ATTEND VALUES(#{class_idx},#{stu_idx},#{attend_date},#{a_a_idx},#{attend_note},0)
+<!-- INSERT INTO ATTEND VALUES(#{class_idx},#{stu_idx},TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-'),#{a_a_idx},#{attend_note},0) -->	
+</insert>
+<update id="cc_submitOneAttendUpdate" parameterType="gyum_02.cybercampus.Model.CC_AttendDTO">
+	UPDATE ATTEND SET a_a_idx=#{a_a_idx}, attend_note=#{attend_note} WHERE CLASS_IDX=#{class_idx} AND STU_IDX=#{stu_idx} AND ATTEND_DATE=#{attend_date}
+</update>
+<select id="cc_gotoDateAttendWrite" parameterType="MAP" resultType="gyum_02.cybercampus.Model.CC_AttendDTO">
+	SELECT * FROM (SELECT ROWNUM AS RNUM, STUDATA.*, SOMEDATA.A_A_IDX, SOMEDATA.ATTEND_NOTE FROM (SELECT TO_CHAR(SYSDATE,'YYYY-MM-DD') AS TODAY, CLASS_STUDENT.*, STUDENT.STU_NAME, STUDENT.STU_ID
+	FROM CLASS_STUDENT,STUDENT WHERE CLASS_STUDENT.STU_IDX=STUDENT.STU_IDX AND CLASS_STUDENT.CLASS_IDX=#{class_idx} ORDER BY STU_NAME ASC)STUDATA
+	LEFT JOIN (SELECT ATTEND.STU_IDX, ATTEND.A_A_IDX, ATTEND.ATTEND_NOTE, ATTEND.CLASS_IDX FROM ATTEND WHERE ATTEND.ATTEND_DATE=#{attend_date})SOMEDATA
+	ON STUDATA.STU_IDX=SOMEDATA.STU_IDX AND STUDATA.CLASS_IDX=SOMEDATA.CLASS_IDX)ATTENDTABLE ORDER BY ATTENDTABLE.STU_NAME ASC
+</select>
+<select id="cc_countOneAttendNoteUpdate" parameterType="gyum_02.cybercampus.Model.CC_AttendDTO" resultType="int">
+	SELECT A_A_IDX FROM ATTEND WHERE CLASS_IDX=#{class_idx} AND STU_IDX=#{stu_idx} AND ATTEND_DATE=#{attend_date}
+</select>
+<update id="cc_submitOneAttendNoteUpdate" parameterType="MAP">
+	UPDATE ATTEND SET ATTEND_NOTE=#{attend_note} WHERE CLASS_IDX=#{class_idx} AND STU_IDX=#{stu_idx} AND ATTEND_DATE=#{attend_date}
+</update>
+<select id="cc_gotoAllAttendWrite" parameterType="int" resultType="gyum_02.cybercampus.Model.CC_AttendDTO">
+	SELECT * FROM (SELECT ROWNUM AS RNUM, STUDATA.*, SOMEDATA.A_A_IDX, SOMEDATA.ATTEND_NOTE FROM (SELECT TO_CHAR(SYSDATE,'YYYY-MM-DD') AS TODAY, CLASS_STUDENT.*, STUDENT.STU_NAME, STUDENT.STU_ID
+	FROM CLASS_STUDENT,STUDENT WHERE CLASS_STUDENT.STU_IDX=STUDENT.STU_IDX AND CLASS_STUDENT.CLASS_IDX=#{class_idx} ORDER BY STU_NAME ASC)STUDATA
+	LEFT JOIN (SELECT ATTEND.STU_IDX, ATTEND.A_A_IDX, ATTEND.ATTEND_NOTE, ATTEND.CLASS_IDX FROM ATTEND WHERE ATTEND.ATTEND_DATE=(SELECT TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-') FROM DUAL))SOMEDATA
+	ON STUDATA.STU_IDX=SOMEDATA.STU_IDX AND STUDATA.CLASS_IDX=SOMEDATA.CLASS_IDX)ATTENDTABLE ORDER BY ATTENDTABLE.STU_NAME ASC
+</select>
+<!-- CYBERCAMPUS SCORE -->
+<select id="cc_totalCntScoreList" parameterType="MAP" resultType="int">
+	SELECT COUNT(*) FROM STU_SCORE WHERE STU_IDX=#{stu_idx} AND CLASS_IDX=#{class_idx}
+</select>
+<select id="cc_gotoScoreContentList" parameterType="MAP" resultType="gyum_02.cybercampus.Model.CC_AttendDTO">
+	SELECT CLASS.CLASS_IDX,CLASS.SUBJECT_NUM,CLASS.CLASS_DAY,CLASS.CLASSROOM,CLASS.CLASS_SUBJECT,STUDENT.STU_NAME, STU_SCORE.S_S_DATE, CLASS_NUM.CLASS_NUM, STU_SCORE.S_S_RESULT
+	FROM CLASS,STUDENT,CLASS_STUDENT,STU_SCORE,CLASS_NUM WHERE CLASS.CLASS_IDX=CLASS_STUDENT.CLASS_IDX AND CLASS_STUDENT.STU_IDX=STUDENT.STU_IDX AND STU_SCORE.STU_IDX=STUDENT.STU_IDX
+	AND CLASS.CLASS_IDX=STU_SCORE.CLASS_IDX AND CLASS.SUBJECT_NUM=CLASS_NUM.SUBJECT_IDX AND STUDENT.STU_IDX=#{stu_idx} AND CLASS.CLASS_IDX=#{class_idx}
+</select>
+<select id="cc_gotoAllScoreWrite" parameterType="int" resultType="gyum_02.cybercampus.Model.CC_AttendDTO">
+	SELECT STUDENT.STU_IDX,STUDENT.STU_NAME,STUDENT.STU_ID,SUBJECT_NUM
+	FROM STUDENT,CLASS_STUDENT,(SELECT SUBJECT_NUM,CLASS_NUM,CLASS_IDX FROM CLASS_NUM, CLASS
+	WHERE CLASS.SUBJECT_NUM=CLASS_NUM.SUBJECT_IDX)CLASSTAB
+	WHERE STUDENT.STU_IDX=CLASS_STUDENT.STU_IDX AND CLASS_STUDENT.CLASS_IDX=#{class_idx}
+	AND CLASS_STUDENT.CLASS_IDX=CLASSTAB.CLASS_IDX
+</select>
+<select id="cc_submitAllScoreWrite" parameterType="MAP" resultType="int">
+	INSERT ALL
+	<foreach item="list" collection="dtolist" index="index" open="" separator=")" close=")">
+		INTO STU_SCORE VALUES(
+		#{list.stu_idx},
+		#{list.subject_num},
+		#{list.class_idx},
+		#{list.s_s_result},
+		#{list.s_s_date},
+		#{list.club_idx}
+	</foreach>
+	SELECT * FROM DUAL
+</select>
+<!-- CYBERCAMPUS ATTEND&SCORE LIST -->
+<select id="cc_totalCntSingleAttendContentList" parameterType="Map" resultType="Integer">
+<![CDATA[SELECT COUNT(CPERIOD.PERITEMP) FROM
+(SELECT ROWNUM AS RNUM, PERITEMP FROM (SELECT TO_CHAR(TO_DATE((SELECT CLASS_STARTDATE FROM CLASS WHERE CLASS_IDX=#{class_idx}), 'YYYYMMDD')+LEVEL-1, 'YYYYMMDD')PERITEMP 
+FROM DUAL CONNECT BY LEVEL <= TO_DATE((SELECT CLASS_ENDDATE FROM CLASS WHERE CLASS_IDX=#{class_idx}), 'YYYYMMDD')-TO_DATE((SELECT CLASS_STARTDATE FROM CLASS WHERE CLASS_IDX=#{class_idx}), 'YYYYMMDD')+1))CPERIOD
+WHERE MOD(RNUM,7)=1]]>
+</select>
+<select id="cc_gotoSingleScoreContentList" parameterType="Map" resultType="gyum_02.cybercampus.Model.CC_AttendDTO">
+<![CDATA[SELECT * FROM (SELECT REALPERIOD.RNUM, REALPERIOD.PERITEMP AS ATTEND_DATE, CLASSOKFINE.A_A_IDX, CLASSOKFINE.ATTEND_NOTE FROM
+(SELECT ROWNUM AS RNUM, TO_NUMBER(CPERIOD.PERITEMP) AS PERITEMP FROM
+(SELECT ROWNUM AS RNUM, PERITEMP FROM (SELECT TO_CHAR(TO_DATE((SELECT CLASS_STARTDATE FROM CLASS WHERE CLASS_IDX=#{class_idx}), 'YYYYMMDD')+LEVEL-1, 'YYYYMMDD')PERITEMP 
+FROM DUAL CONNECT BY LEVEL <= TO_DATE((SELECT CLASS_ENDDATE FROM CLASS WHERE CLASS_IDX=#{class_idx}), 'YYYYMMDD')-TO_DATE((SELECT CLASS_STARTDATE FROM CLASS WHERE CLASS_IDX=#{class_idx}), 'YYYYMMDD')+1))CPERIOD
+WHERE MOD(RNUM,7)=1)REALPERIOD LEFT JOIN (SELECT ATAB.*, CLASSPERIOD.* FROM
+(SELECT ATTEND.A_A_IDX,ATTEND.ATTEND_NOTE, ATTEND.ATTEND_DATE FROM CLASS, STUDENT, CLASS_STUDENT,ATTEND WHERE CLASS.CLASS_IDX=#{class_idx} AND STUDENT.STU_IDX=#{stu_idx} AND ATTEND.STU_IDX=STUDENT.STU_IDX
+AND CLASS.CLASS_IDX=CLASS_STUDENT.CLASS_IDX AND CLASS_STUDENT.STU_IDX=STUDENT.STU_IDX)ATAB, (SELECT ROWNUM AS RNUM, TO_NUMBER(CPERIOD.PERITEMP) AS PERITEMP FROM
+(SELECT ROWNUM AS RNUM, PERITEMP FROM (SELECT TO_CHAR(TO_DATE((SELECT CLASS_STARTDATE FROM CLASS WHERE CLASS_IDX=#{class_idx}), 'YYYYMMDD')+LEVEL-1, 'YYYYMMDD')PERITEMP 
+FROM DUAL CONNECT BY LEVEL <= TO_DATE((SELECT CLASS_ENDDATE FROM CLASS WHERE CLASS_IDX=#{class_idx}), 'YYYYMMDD')-TO_DATE((SELECT CLASS_STARTDATE FROM CLASS WHERE CLASS_IDX=#{class_idx}), 'YYYYMMDD')+1))CPERIOD
+WHERE MOD(RNUM,7)=1)CLASSPERIOD WHERE CLASSPERIOD.PERITEMP=ATAB.ATTEND_DATE ORDER BY CLASSPERIOD.RNUM ASC)CLASSOKFINE ON CLASSOKFINE.ATTEND_DATE=REALPERIOD.PERITEMP ORDER BY REALPERIOD.RNUM ASC)FORPAGING
+WHERE RNUM>=#{startnum} AND RNUM<=#{endnum}]]>
+</select>
+<select id="cc_totalCntMyClassMate" parameterType="int" resultType="int">
+	SELECT COUNT(*) FROM STUDENT,CLASS_STUDENT WHERE CLASS_STUDENT.STU_IDX=STUDENT.STU_IDX AND CLASS_STUDENT.CLASS_IDX=#{class_idx}		
+</select>
+<select id="cc_gotoMyClassMate" parameterType="int" resultType="gyum_02.cybercampus.Model.CC_AttendDTO">
+	SELECT ROWNUM AS RNUM, STUTAB.STU_IDX, STUTAB.STU_NAME,STUTAB.STU_ID,TO_TIMESTAMP(TO_CHAR(STUTAB.STU_IN_DATE,'YYYY-MM-DD HH24:MI:SS')) AS STU_IN_DATE
+	FROM (SELECT STUDENT.STU_IDX, STUDENT.STU_NAME,STUDENT.STU_ID,STUDENT.STU_IN_DATE FROM STUDENT, CLASS_STUDENT
+	WHERE STUDENT.STU_IDX=CLASS_STUDENT.STU_IDX AND CLASS_STUDENT.CLASS_IDX=#{class_idx} ORDER BY STUDENT.STU_IDX ASC)STUTAB
+</select>
+<select id="cc_gotoStudentAttendMain" parameterType="int" resultType="gyum_02.cybercampus.Model.CC_AttendDTO">
+	SELECT ROWNUM AS RNUM, ATB.STU_IDX, ATB.STU_ID, ATB.STU_NAME FROM (SELECT STUDENT.STU_IDX, STUDENT.STU_ID, STUDENT.STU_NAME FROM STUDENT, CLASS_STUDENT, CLASS
+	WHERE STUDENT.STU_IDX=CLASS_STUDENT.STU_IDX	AND CLASS_STUDENT.CLASS_IDX=CLASS.CLASS_IDX	AND CLASS_STUDENT.CLASS_IDX=#{class_idx} ORDER BY STUDENT.STU_IDX)ATB
+</select>
+<select id="cc_gotoTeacherAttendMain" parameterType="MAP" resultType="gyum_02.cybercampus.Model.CC_AttendDTO">
+	<![CDATA[SELECT * FROM
+	(SELECT ROWNUM AS RNUM, ATB.STU_IDX, ATB.STU_ID, ATB.STU_NAME, ATB.CLASS_SUBJECT
+	FROM (SELECT STUDENT.STU_IDX, STUDENT.STU_ID, STUDENT.STU_NAME, CLASS.CLASS_SUBJECT FROM STUDENT, CLASS_STUDENT, CLASS
+	WHERE STUDENT.STU_IDX=CLASS_STUDENT.STU_IDX	AND CLASS_STUDENT.CLASS_IDX=CLASS.CLASS_IDX AND CLASS_STUDENT.CLASS_IDX=#{class_idx}
+	ORDER BY STUDENT.STU_IDX)ATB)BTB WHERE RNUM>=#{startnum} AND RNUM<=#{endnum}]]>
+</select>
+<select id="cc_callSubjectName" parameterType="int" resultType="String">
+	SELECT CLASS_SUBJECT FROM CLASS WHERE CLASS_IDX=#{class_idx}
+</select>
+<select id="cc_totalCntAttendList" parameterType="int" resultType="int">
+	SELECT COUNT(ATB.STU_ID) FROM (SELECT STUDENT.STU_IDX, STUDENT.STU_ID, STUDENT.STU_NAME, CLASS.CLASS_SUBJECT FROM STUDENT, CLASS_STUDENT, CLASS
+	WHERE STUDENT.STU_IDX=CLASS_STUDENT.STU_IDX	AND CLASS_STUDENT.CLASS_IDX=CLASS.CLASS_IDX AND CLASS_STUDENT.CLASS_IDX=#{class_idx} ORDER BY STUDENT.STU_IDX)ATB
+</select>
+
+
+<!-- CYBERCAMPUS FREEBBS -->
+<select id="cc_totalCntFreeBBSList" parameterType="int" resultType="int">
+	SELECT COUNT(*) FROM CLUB_FREE_BBS WHERE CLUB_IDX=#{club_idx}
+</select>
+<select id="cc_gotoFreeBBSList" parameterType="int" resultType="gyum_02.cybercampus.Model.CC_FreeBBSDTO">
+	<![CDATA[SELECT BTAB.C_F_B_IDX, BTAB.CLUB_IDX, BTAB.C_F_B_WRITER, BTAB.C_F_B_SUBJECT, BTAB.C_F_B_CONTENT,
+	TO_TIMESTAMP(TO_CHAR(BTAB.C_F_B_WRITEDATE,'YYYY-MM-DD HH24:MI:SS')) AS C_F_B_WRITEDATE FROM (SELECT ROWNUM AS RNUM, ATAB.*
+	FROM (SELECT * FROM CLUB_FREE_BBS WHERE CLUB_IDX=#{club_idx} ORDER BY C_F_B_IDX DESC)ATAB)BTAB
+	WHERE RNUM>=#{startnum} AND RNUM<=#{endnum}]]>
+</select>
+<insert id="cc_submitFreeBBSWrite" parameterType="gyum_02.cybercampus.Model.CC_FreeBBSDTO">
+	INSERT INTO CLUB_FREE_BBS
+	VALUES(CLUB_FREE_BBS_C_F_B_IDX.NEXTVAL,#{club_idx},#{c_f_b_writer},#{c_f_b_subject},#{c_f_b_content},SYSDATE)
+</insert>
+<update id="cc_submitFreeBBSUpdate" parameterType="gyum_02.cybercampus.Model.CC_FreeBBSDTO">
+	UPDATE CLUB_FREE_BBS SET C_F_B_SUBJECT=#{c_f_b_subject}, C_F_B_CONTENT=#{c_f_b_content} WHERE C_F_B_IDX=#{c_f_b_idx}
+</update>
+<delete id="cc_submitFreeBBSDelete" parameterType="INT">
+	DELETE CLUB_FREE_BBS WHERE C_F_B_IDX=#{c_f_b_idx}
+</delete>
+<select id="cc_gotoFreeBBSContent" parameterType="INT" resultType="gyum_02.cybercampus.Model.CC_FreeBBSDTO">
+	SELECT C_F_B_IDX, C_F_B_WRITER, C_F_B_SUBJECT, C_F_B_CONTENT,
+	TO_TIMESTAMP(TO_CHAR(C_F_B_WRITEDATE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS C_F_B_WRITEDATE
+	FROM CLUB_FREE_BBS WHERE C_F_B_IDX=#{c_f_b_idx}
+</select>
+	<!-- FREEBBS REPLY -->
+	<insert id="cc_submitFreeBBSReply" parameterType="Map">
+		INSERT INTO CLUB_FREE_BBS_REPLY VALUES(C_F_B_R_IDX.NEXTVAL,#{c_f_b_idx},#{c_f_b_r_writer},#{c_f_b_r_content},#{c_f_b_r_towho},SYSDATE)
+	</insert>
+	<select id="cc_getFreeBBSReplyList" parameterType="Map" resultType="gyum_02.cybercampus.Model.CC_FreeBBSDTO">
+		SELECT C_F_B_R_IDX, C_F_B_IDX, C_F_B_R_WRITER, C_F_B_R_CONTENT, C_F_B_R_TOWHO,
+		TO_TIMESTAMP(TO_CHAR(C_F_B_R_DATE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS C_F_B_R_DATE
+		FROM CLUB_FREE_BBS_REPLY WHERE C_F_B_IDX=#{c_f_b_idx} ORDER BY C_F_B_R_IDX ASC
+	</select>
+	<!-- FREEBBS IMAGE -->
+
+<!-- CYBERCAMPUS STORAGE -->
+<select id="cc_checkStudentHomeworkStatus" parameterType="Map" resultType="Integer">
+	SELECT COUNT(C_H_S_IDX) FROM CLUB_HOMEWORK_STUDENT WHERE C_H_T_IDX=#{c_h_t_idx} AND STU_IDX=#{stu_idx}
+</select>
+<select id="cc_checkStudentHomeworkTimeOver" parameterType="Map" resultType="Integer">
+	<![CDATA[SELECT COUNT(C_H_T_IDX)
+	FROM CLUB_HOMEWORK_TEACHER
+	WHERE TO_TIMESTAMP(TO_CHAR(CLUB_HOMEWORK_TEACHER.C_H_T_DEADLINE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS')<TO_TIMESTAMP(TO_CHAR(SYSDATE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS')
+	AND C_H_T_IDX=#{c_h_t_idx}]]>
+</select>
+
+<select id="cc_getStudentHomeworkListDownload" parameterType="Map" resultType="gyum_02.cybercampus.Model.CC_RepositoryDTO">
+	SELECT CLUB_HOMEWORK_STUDENT.C_H_S_IDX, CLUB_HOMEWORK_STUDENT.C_H_T_IDX, CLUB_HOMEWORK_STUDENT.STU_IDX, STUDENT.STU_NAME, STUDENT.STU_ID, CLUB_HOMEWORK_STUDENT.CLASS_IDX, CLUB_HOMEWORK_STUDENT.C_H_S_CONTENT,
+	TO_TIMESTAMP(TO_CHAR(CLUB_HOMEWORK_STUDENT.C_H_S_WRITEDATE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS C_H_S_WRITEDATE FROM CLUB_HOMEWORK_STUDENT, STUDENT
+	WHERE CLUB_HOMEWORK_STUDENT.CLASS_IDX=#{class_idx} AND CLUB_HOMEWORK_STUDENT.C_H_T_IDX=#{c_h_t_idx} AND CLUB_HOMEWORK_STUDENT.STU_IDX=STUDENT.STU_IDX
+</select>
+<select id="cc_getStudentHomeworkFileDownloadList" parameterType="Map" resultType="gyum_02.cybercampus.Model.CC_RepositoryDTO">
+	SELECT * FROM CLUB_STORAGE WHERE CLASS_IDX=#{class_idx} AND C_H_S_IDX=#{c_h_s_idx}
+</select>
+<select id="cc_totalCntHomeworkList" parameterType="Integer" resultType="Integer">
+	SELECT COUNT(CLUB_HOMEWORK_TEACHER.C_H_T_IDX) FROM CLUB_HOMEWORK_TEACHER, CLASS, TEACHER WHERE CLUB_HOMEWORK_TEACHER.CLASS_IDX=CLASS.CLASS_IDX
+	AND CLASS.TEA_IDX=TEACHER.TEA_IDX AND CLUB_HOMEWORK_TEACHER.CLASS_IDX=#{class_idx}
+</select>
+<select id="cc_gotoTeacherCCRepositoryList" parameterType="Map" resultType="gyum_02.cybercampus.Model.CC_RepositoryDTO">
+	<![CDATA[SELECT * FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM
+	(SELECT CLUB_HOMEWORK_TEACHER.C_H_T_IDX, CLUB_HOMEWORK_TEACHER.C_H_T_SUBJECT, TO_TIMESTAMP(TO_CHAR(CLUB_HOMEWORK_TEACHER.C_H_T_STARTDATE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS C_H_T_STARTDATE,
+	TO_TIMESTAMP(TO_CHAR(CLUB_HOMEWORK_TEACHER.C_H_T_ENDDATE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS C_H_T_ENDDATE, TO_TIMESTAMP(TO_CHAR(CLUB_HOMEWORK_TEACHER.C_H_T_DEADLINE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS C_H_T_DEADLINE, TO_TIMESTAMP(TO_CHAR(CLUB_HOMEWORK_TEACHER.C_H_T_WRITEDATE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS C_H_T_WRITEDATE,TEACHER.TEA_NAME
+	FROM CLUB_HOMEWORK_TEACHER, CLASS, TEACHER WHERE CLUB_HOMEWORK_TEACHER.CLASS_IDX=CLASS.CLASS_IDX
+	AND CLASS.TEA_IDX=TEACHER.TEA_IDX AND CLUB_HOMEWORK_TEACHER.CLASS_IDX=#{class_idx} ORDER BY CLUB_HOMEWORK_TEACHER.C_H_T_IDX DESC)ATAB)BTAB WHERE RNUM>=#{startnum} AND RNUM<=#{endnum}]]>
+</select>
+<select id="cc_gotoStudentCCRepositoryList" parameterType="MAP" resultType="gyum_02.cybercampus.Model.CC_RepositoryDTO">
+	SELECT * FROM CLUB_HOMEWORK_STUDENT, CLASS, STUDENT, FILEDB WHERE CLUB_HOMEWORK_STUDENT.FILE_IDX=FILEDB.FILE_IDX
+	AND CLUB_HOMEWORK_STUDENT.STU_IDX=STUDENT.STU_IDX AND CLUB_HOMEWORK_STUDENT.CLASS_IDX=CLASS.CLASS_IDX
+	AND CLUB_HOMEWORK_STUDENT.STU_IDX=#{stu_idx} AND CLUB_HOMEWORK_STUDENT.CLASS_IDX=#{class_idx}
+</select>
+<select id="cc_fetchForDeleteTeacherHomeworkContent" parameterType="Integer" resultType="Integer">
+	SELECT C_H_S_IDX FROM CLUB_HOMEWORK_STUDENT WHERE C_H_T_IDX=#{c_h_t_idx}
+</select>
+<delete id="cc_deleteTeacherHomeworkContentStudentsFile" parameterType="Map">
+	DELETE CLUB_STORAGE
+	<foreach collection="chsIdxList" item="chsIdxList" index="index" separator="or">
+	WHERE C_H_S_IDX=#{c_h_s_idx}
+	</foreach>
+</delete>
+<delete id="cc_deleteTeacherHomeworkContentStudentList" parameterType="Integer">
+	DELETE CLUB_HOMEWORK_STUDENT WHERE C_H_T_IDX=#{c_h_t_idx}
+</delete>
+<delete id="cc_deleteTeacherHomeworkContent" parameterType="Integer">
+	DELETE CLUB_HOMEWORK_TEACHER WHERE C_H_T_IDX=#{c_h_t_idx}
+</delete>
+
+
+<insert id="cc_submitHomeworkWrite" parameterType="gyum_02.cybercampus.Model.CC_RepositoryDTO">
+	insert into club_homework_teacher values(c_h_t_idx.nextval,#{class_idx},#{c_h_t_subject},#{c_h_t_startdate},#{c_h_t_enddate},#{c_h_t_deadline},#{c_h_t_notice},sysdate)
+</insert>
+<select id="cc_gotoHomeworkContent" parameterType="int" resultType="gyum_02.cybercampus.Model.CC_RepositoryDTO">
+	SELECT CLUB_HOMEWORK_TEACHER.C_H_T_IDX, CLUB_HOMEWORK_TEACHER.C_H_T_SUBJECT, TO_TIMESTAMP(TO_CHAR(CLUB_HOMEWORK_TEACHER.C_H_T_STARTDATE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS C_H_T_STARTDATE,
+	TO_TIMESTAMP(TO_CHAR(CLUB_HOMEWORK_TEACHER.C_H_T_ENDDATE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS C_H_T_ENDDATE, TO_TIMESTAMP(TO_CHAR(CLUB_HOMEWORK_TEACHER.C_H_T_DEADLINE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS C_H_T_DEADLINE,
+	TO_TIMESTAMP(TO_CHAR(CLUB_HOMEWORK_TEACHER.C_H_T_WRITEDATE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS C_H_T_WRITEDATE FROM CLUB_HOMEWORK_TEACHER WHERE C_H_T_IDX=#{c_h_t_idx}
+</select>
+<insert id="cc_submitStudentHomeworkFileWrite" parameterType="MAP">
+	INSERT INTO CLUB_STORAGE VALUES(C_S_IDX.NEXTVAL,#{class_idx},#{c_h_s_idx},#{c_s_filepath},#{c_s_filename},#{c_s_orifilename},SYSDATE)
+</insert>
+<insert id="cc_submitStudentHomeworkWrite" parameterType="MAP">
+	INSERT INTO CLUB_HOMEWORK_STUDENT VALUES(C_H_S_IDX.NEXTVAL,#{c_h_t_idx},#{stu_idx},SYSDATE,#{class_idx},#{c_h_s_content})
+</insert>
+<select id="cc_getStudentHomeworkWriteIDX" resultType="int">
+	SELECT MAX(C_H_S_IDX) FROM CLUB_HOMEWORK_STUDENT
+</select>
+<select id="cc_getStudentHomeworkList" parameterType="MAP" resultType="gyum_02.cybercampus.Model.CC_RepositoryDTO">
+SELECT C_H_S_IDX, C_H_T_IDX, STU_IDX, CLASS_IDX, C_H_S_CONTENT, TO_TIMESTAMP(TO_CHAR(C_H_S_WRITEDATE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS C_H_S_WRITEDATE FROM CLUB_HOMEWORK_STUDENT WHERE CLUB_HOMEWORK_STUDENT.CLASS_IDX=#{class_idx}
+AND CLUB_HOMEWORK_STUDENT.STU_IDX=#{stu_idx} AND CLUB_HOMEWORK_STUDENT.C_H_T_IDX=#{c_h_t_idx}
+</select>
+<select id="cc_getStudentHomeworkFile" parameterType="Map" resultType="gyum_02.cybercampus.Model.CC_RepositoryDTO">
+	SELECT * FROM CLUB_STORAGE WHERE CLASS_IDX=#{class_idx} AND C_H_S_IDX=#{c_h_s_idx}
+</select>
+<select id="cc_getStudentHomeworkFileDownloadPath" parameterType="int" resultType="gyum_02.cybercampus.Model.CC_RepositoryDTO">
+	SELECT * FROM CLUB_STORAGE WHERE C_S_IDX=#{c_s_idx}
+</select>
+<delete id="cc_deleteStudentHomeworkFileDB" parameterType="Integer">
+	DELETE CLUB_STORAGE WHERE C_H_S_IDX=#{c_h_s_idx}
+</delete>
+<delete id="cc_deleteStudentHomeworkContent" parameterType="Integer">
+	DELETE CLUB_HOMEWORK_STUDENT WHERE C_H_S_IDX=#{c_h_s_idx}
+</delete>
+<!-- CYBERCAMPUS QnA -->
+<select id="cc_totalCntQnAList" parameterType="int" resultType="int">
+	SELECT COUNT(*) FROM CLUB_QNA_QUESTION WHERE CLUB_IDX=#{club_idx}
+</select>
+<select id="cc_gotoQnAList" parameterType="map" resultType="gyum_02.cybercampus.Model.CC_QnADTO">
+	<![CDATA[SELECT BTB.C_Q_Q_IDX,BTB.CLUB_IDX,BTB.C_Q_Q_WRITER,BTB.C_Q_Q_SUBJECT,BTB.C_Q_Q_CONTENT,TO_TIMESTAMP(TO_CHAR(BTB.C_Q_Q_WRITEDATE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS C_Q_Q_WRITEDATE
+	FROM (SELECT ROWNUM AS RNUM, ATB.* FROM (SELECT * FROM CLUB_QNA_QUESTION WHERE CLUB_IDX=#{club_idx} ORDER BY C_Q_Q_IDX DESC)ATB)BTB
+	WHERE RNUM>=#{startnum} AND RNUM<=#{endnum}]]>
+</select>
+<insert id="cc_submitQnAWrite" parameterType="gyum_02.cybercampus.Model.CC_QnADTO">
+	INSERT INTO CLUB_QNA_QUESTION VALUES(
+	CLUB_QNA_QUESTION_C_Q_Q_IDX.NEXTVAL,#{club_idx},#{c_q_q_writer},#{c_q_q_subject},#{c_q_q_content},SYSDATE)
+</insert>
+<select id="cc_gotoQnAContent" parameterType="int" resultType="gyum_02.cybercampus.Model.CC_QnADTO">
+	SELECT C_Q_Q_IDX, C_Q_Q_WRITER, C_Q_Q_SUBJECT, C_Q_Q_CONTENT, TO_TIMESTAMP(TO_CHAR(C_Q_Q_WRITEDATE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS C_Q_Q_WRITEDATE
+	FROM CLUB_QNA_QUESTION WHERE C_Q_Q_IDX=#{c_q_q_idx}
+</select>
+<update id="cc_submitQnAUpdate" parameterType="gyum_02.cybercampus.Model.CC_QnADTO">
+	UPDATE CLUB_QNA_QUESTION SET C_Q_Q_SUBJECT=#{c_q_q_subject}, C_Q_Q_CONTENT=#{c_q_q_content} WHERE C_Q_Q_IDX=#{c_q_q_idx}
+</update>
+<delete id="cc_submitQnADelete" parameterType="int">
+	DELETE CLUB_QNA_QUESTION WHERE C_Q_Q_IDX=#{c_q_q_idx}
+</delete>
+<!-- CYBERCAMPUS QnA REPLY -->
+<select id="cc_totalCntQnAReplyList" parameterType="int" resultType="int">
+	SELECT COUNT(*) FROM CLUB_QNA_ANSWER WHERE C_Q_Q_IDX=#{c_q_q_idx}
+</select>
+<select id="cc_gotoQnAReplyContentList" parameterType="map" resultType="gyum_02.cybercampus.Model.CC_QnADTO">
+	<![CDATA[SELECT BTB.RNUM, BTB.C_Q_Q_SUBJECT, BTB.C_Q_A_IDX,BTB.C_Q_Q_IDX,BTB.C_Q_A_WRITER,BTB.C_Q_A_CONTENT,TO_TIMESTAMP(TO_CHAR(BTB.C_Q_A_WRITEDATE,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS C_Q_A_WRITEDATE
+	FROM (SELECT ROWNUM AS RNUM, ATB.* FROM (SELECT CLUB_QNA_QUESTION.C_Q_Q_SUBJECT ,CLUB_QNA_ANSWER.*
+	FROM CLUB_QNA_QUESTION, CLUB_QNA_ANSWER WHERE CLUB_QNA_QUESTION.C_Q_Q_IDX=CLUB_QNA_ANSWER.C_Q_Q_IDX AND CLUB_QNA_QUESTION.C_Q_Q_IDX=#{c_q_q_idx}
+	ORDER BY C_Q_A_IDX DESC)ATB)BTB WHERE RNUM>=#{startnum} AND RNUM<=#{endnum}]]>
+</select>
+<insert id="cc_submitQnAReplyWrite" parameterType="gyum_02.cybercampus.Model.CC_QnADTO">
+	INSERT INTO CLUB_QNA_ANSWER VALUES(CLUB_QNA_ANSWER_C_Q_A_IDX.NEXTVAL,#{c_q_q_idx},#{c_q_a_writer},#{c_q_a_content},SYSDATE)
+</insert>
+<update id="cc_submitQnAReplyUpdate" parameterType="gyum_02.cybercampus.Model.CC_QnADTO">
+	UPDATE CLUB_QNA_ANSWER SET C_Q_A_CONTENT=#{c_q_a_content}, C_Q_A_WRITEDATE=SYSDATE WHERE C_Q_A_IDX=#{c_q_a_idx}
+</update>
+<delete id="cc_submitQnAReplyDelete" parameterType="int">
+	DELETE CLUB_QNA_ANSWER WHERE C_Q_A_IDX=#{c_q_a_idx}
+</delete>
+<!-- CYBERCAMPUS EPILOGUE -->
+<select id="cc_gotoEpilogueClass" parameterType="MAP" resultType="gyum_02.cybercampus.Model.CC_EpilogueDTO">
+	select c_r_idx, class_idx,c_r_subject,c_r_content,c_r_writer,
+		TO_TIMESTAMP(TO_CHAR(c_r_writedate,'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS c_r_writedate
+	 from
+		(select rownum as rnum,a.* from 
+			(SELECT * FROM CLASS_REVIEW where class_idx=#{class_idx} ORDER BY C_R_IDX DESC)a
+		)b
+<!-- 	where rnum<![CDATA[>=]]>(#{cp}<![CDATA[-1]]>)<![CDATA[*]]>#{ls}<![CDATA[+1]]> 
+	and rnum<![CDATA[<=]]>#{cp}<![CDATA[*]]>#{ls}  -->
+</select>
+<insert id="cc_submitEpilogueWrite" parameterType="gyum_02.cybercampus.Model.CC_EpilogueDTO">
+	INSERT INTO CLASS_REVIEW
+	VALUES(CLASS_REVIEW_C_R_IDX.NEXTVAL,#{class_idx},'reply',#{c_r_content},SYSDATE,0,#{c_r_writer},0,0)
+</insert>
+<update id="cc_submitEpilogueUpdate" parameterType="gyum_02.cybercampus.Model.CC_EpilogueDTO">
+	UPDATE CLASS_REVIEW
+	SET C_R_CONTENT=#{c_r_content}
+	WHERE C_R_IDX=#{c_r_idx}
+</update>
+<delete id="cc_submitEpilogueDelete" parameterType="INT">
+	DELETE CLASS_REVIEW
+	WHERE C_R_IDX=#{c_r_idx}
+</delete>
+<!-- CYBERCAMPUS MASTER PLANNED CLASS -->
+<select id="cc_totalCntMasterPlannedClassList" resultType="int">
+	<![CDATA[SELECT COUNT(*) FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (SELECT CLASS.*, TEACHER.TEA_NAME, CLASS_CHECK.CLASS_CHECK FROM CLASS, TEACHER, CLASS_CHECK WHERE CLASS.TEA_IDX=TEACHER.TEA_IDX
+	AND CLASS.CLASS_IDX=CLASS_CHECK.CLASS_IDX AND CLASS.CLASS_STARTDATE>TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-') ORDER BY CLASS.CLASS_IDX DESC)ATAB)BTAB]]>
+</select>
+<select id="cc_gotoMasterPlannedClassList" parameterType="MAP" resultType="gyum_02.cybercampus.Model.CC_ClassDTO">
+	<![CDATA[SELECT * FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (SELECT CLASS.*, TEACHER.TEA_NAME, CLASS_CHECK.CLASS_CHECK FROM CLASS, TEACHER, CLASS_CHECK WHERE CLASS.TEA_IDX=TEACHER.TEA_IDX
+	AND CLASS.CLASS_STARTDATE>TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-') AND CLASS.CLASS_IDX=CLASS_CHECK.CLASS_IDX ORDER BY CLASS.CLASS_IDX DESC)ATAB)BTAB
+	WHERE RNUM>=#{startnum} AND RNUM<=#{endnum}]]>
+</select>
+<!-- CYBERCAMPUS MASTER CURRENT CLASS -->
+<select id="cc_totalCntMasterCurrentClassList" resultType="int">
+	<![CDATA[SELECT COUNT(*) FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (SELECT CLASS.*, TEACHER.TEA_NAME, CLASS_CHECK.CLASS_CHECK FROM CLASS, CLASS_CHECK, TEACHER WHERE CLASS.TEA_IDX=TEACHER.TEA_IDX
+	AND CLASS.CLASS_ENDDATE>=TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-')
+	AND CLASS.CLASS_ENDDATE<TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-')
+	AND CLASS.CLASS_IDX=CLASS_CHECK.CLASS_IDX
+	ORDER BY CLASS.CLASS_IDX DESC)ATAB)BTAB]]>
+</select>
+<select id="cc_gotoMasterCurrentClassList" parameterType="MAP" resultType="gyum_02.cybercampus.Model.CC_ClassDTO">
+	<![CDATA[SELECT * FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (SELECT CLASS.*, TEACHER.TEA_NAME, CLASS_CHECK.CLASS_CHECK FROM CLASS, TEACHER, CLASS_CHECK WHERE CLASS.TEA_IDX=TEACHER.TEA_IDX
+	AND CLASS.CLASS_ENDDATE>=TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-')
+	AND CLASS.CLASS_STARTDATE<TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-')
+	AND CLASS.CLASS_IDX=CLASS_CHECK.CLASS_IDX
+	ORDER BY CLASS.CLASS_IDX DESC)ATAB)BTAB
+	WHERE RNUM>=#{startnum} AND RNUM<=#{endnum}]]>
+</select>
+<!--  CYBERCAMPUS MASTER OLD CLASS -->
+<select id="cc_gotoMasterOldClassList" parameterType="MAP" resultType="gyum_02.cybercampus.Model.CC_ClassDTO">
+	<![CDATA[SELECT * FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (SELECT CLASS.*, TEACHER.TEA_NAME, CLASS_CHECK.CLASS_CHECK FROM CLASS, TEACHER, CLASS_CHECK WHERE CLASS.TEA_IDX=TEACHER.TEA_IDX
+	AND CLASS.CLASS_ENDDATE<TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-') AND CLASS.CLASS_IDX=CLASS_CHECK.CLASS_IDX ORDER BY CLASS.CLASS_IDX DESC)ATAB)BTAB
+	WHERE RNUM>=#{startnum} AND RNUM<=#{endnum}]]>
+</select>
+<select id="cc_totalCntMasterOldClassList" resultType="int">
+	<![CDATA[SELECT COUNT(CLASS_IDX) FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (SELECT CLASS.*, TEACHER.TEA_NAME, CLASS_CHECK.CLASS_CHECK FROM CLASS, TEACHER, CLASS_CHECK WHERE CLASS.TEA_IDX=TEACHER.TEA_IDX
+	AND CLASS.CLASS_ENDDATE<TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-') AND CLASS.CLASS_IDX=CLASS_CHECK.CLASS_IDX ORDER BY CLASS.CLASS_IDX DESC)ATAB)BTAB]]>
+</select>
+<!-- CYBERCAMPUS STUDENT PLANNED CLASS -->
+<select id="cc_gotoStudentPlannedClassList" parameterType="Map" resultType="gyum_02.cybercampus.Model.CC_ClassDTO">
+	<![CDATA[SELECT BTAB.* FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (SELECT CLASS.*, CLASS_STUDENT.STU_IDX, TEACHER.TEA_NAME FROM CLASS, CLASS_STUDENT, TEACHER
+	WHERE CLASS.CLASS_IDX=CLASS_STUDENT.CLASS_IDX AND CLASS_STUDENT.STU_IDX=#{stu_idx} AND CLASS.TEA_IDX=TEACHER.TEA_IDX
+	AND CLASS.CLASS_STARTDATE>TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-')
+	ORDER BY CLASS.CLASS_IDX DESC)ATAB)BTAB
+	WHERE RNUM>=#{startnum} AND RNUM<=#{endnum}]]>
+</select>
+<select id="cc_totalCntStudentPlannedClassList" parameterType="int" resultType="int">
+	<![CDATA[SELECT COUNT(*) FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (SELECT CLASS.*, CLASS_STUDENT.STU_IDX FROM CLASS,CLASS_STUDENT
+	WHERE CLASS.CLASS_IDX=CLASS_STUDENT.CLASS_IDX AND CLASS_STUDENT.STU_IDX=#{stu_idx}
+	AND CLASS.CLASS_STARTDATE>TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-')
+	ORDER BY CLASS.CLASS_IDX DESC)ATAB)BTAB]]>
+</select>
+<!-- CYBERCAMPUS STUDENT CURRENT CLASS -->
+<select id="cc_gotoStudentCurrentClassList" parameterType="Map" resultType="gyum_02.cybercampus.Model.CC_ClassDTO">
+	<![CDATA[SELECT BTAB.* FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (SELECT CLASS.*, CLASS_STUDENT.STU_IDX, TEACHER.TEA_NAME FROM CLASS, CLASS_STUDENT, TEACHER
+	WHERE CLASS.CLASS_IDX=CLASS_STUDENT.CLASS_IDX AND CLASS_STUDENT.STU_IDX=#{stu_idx} AND CLASS.TEA_IDX=TEACHER.TEA_IDX
+	AND CLASS.CLASS_ENDDATE>=TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-')
+	AND CLASS.CLASS_STARTDATE<=TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-')
+	ORDER BY CLASS.CLASS_IDX DESC)ATAB)BTAB
+	WHERE RNUM>=#{startnum} AND RNUM<=#{endnum}]]>
+</select>
+<select id="cc_totalCntStudentCurrentClassList" parameterType="int" resultType="int">
+	<![CDATA[SELECT COUNT(*) FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (SELECT CLASS.*, CLASS_STUDENT.STU_IDX FROM CLASS,CLASS_STUDENT
+	WHERE CLASS.CLASS_IDX=CLASS_STUDENT.CLASS_IDX AND CLASS_STUDENT.STU_IDX=#{stu_idx}
+	AND CLASS.CLASS_ENDDATE>=TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-')
+	AND CLASS.CLASS_STARTDATE<=TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-')
+	ORDER BY CLASS.CLASS_IDX DESC)ATAB)BTAB]]>
+</select>
+<!-- CYBERCAMPUS STUDENT OLD CLASS -->
+<select id="cc_gotoStudentOldClassList" parameterType="MAP" resultType="gyum_02.cybercampus.Model.CC_ClassDTO">
+	<![CDATA[SELECT BTAB.* FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (SELECT CLASS.*, CLASS_STUDENT.STU_IDX, TEACHER.TEA_NAME FROM CLASS, CLASS_STUDENT, TEACHER
+	WHERE CLASS.CLASS_IDX=CLASS_STUDENT.CLASS_IDX AND CLASS_STUDENT.STU_IDX=#{stu_idx} AND CLASS.TEA_IDX=TEACHER.TEA_IDX
+	AND CLASS.CLASS_ENDDATE<TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-')
+	ORDER BY CLASS.CLASS_IDX DESC)ATAB)BTAB
+	WHERE RNUM>=#{startnum} AND RNUM<=#{endnum}]]>
+</select>
+<select id="cc_totalCntStudentOldClassList" parameterType="int" resultType="int">
+	<![CDATA[SELECT COUNT(*) FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (SELECT CLASS.*, CLASS_STUDENT.STU_IDX FROM CLASS,CLASS_STUDENT
+	WHERE CLASS.CLASS_IDX=CLASS_STUDENT.CLASS_IDX AND CLASS_STUDENT.STU_IDX=#{stu_idx}
+	AND CLASS.CLASS_ENDDATE<TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-')
+	ORDER BY CLASS.CLASS_IDX DESC)ATAB)BTAB]]>
+</select>
+<!-- CYBERCAMPUS TEACHER PLANNED CLASS -->
+<select id="cc_totalCntTeacherPlannedClassList" parameterType="Integer" resultType="Integer">
+	<![CDATA[SELECT COUNT(*) FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (SELECT * FROM CLASS
+	WHERE CLASS.TEA_IDX=#{tea_idx} AND CLASS_STARTDATE>TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-')
+	ORDER BY CLASS_IDX DESC)ATAB)BTAB]]>
+</select>
+<select id="cc_gotoTeacherPlannedClassList" parameterType="MAP" resultType="gyum_02.cybercampus.Model.CC_ClassDTO">
+	<![CDATA[SELECT BTAB.* FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (SELECT CLASS.*,TEACHER.TEA_NAME, CLASS_CHECK.CLASS_CHECK FROM CLASS, TEACHER, CLASS_CHECK
+	WHERE CLASS.TEA_IDX=#{tea_idx} AND CLASS.TEA_IDX=TEACHER.TEA_IDX AND CLASS.CLASS_IDX=CLASS_CHECK.CLASS_IDX
+	AND CLASS_STARTDATE>TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-')
+	ORDER BY CLASS.CLASS_IDX DESC)ATAB)BTAB WHERE RNUM>=#{startnum} AND RNUM<=#{endnum}]]>
+</select>
+<!-- CYBERCAMPUS TEACHER CURRENT CLASS -->
+<select id="cc_gotoTeacherCurrentClassList" parameterType="MAP" resultType="gyum_02.cybercampus.Model.CC_ClassDTO">
+	<![CDATA[SELECT BTAB.* FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (SELECT CLASS.*,TEACHER.TEA_NAME, CLASS_CHECK.CLASS_CHECK FROM CLASS, TEACHER, CLASS_CHECK
+	WHERE CLASS.TEA_IDX=#{tea_idx} AND CLASS.TEA_IDX=TEACHER.TEA_IDX AND CLASS.CLASS_IDX=CLASS_CHECK.CLASS_IDX
+	AND CLASS_ENDDATE>=TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-')
+	AND CLASS_STARTDATE<=TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-')
+	ORDER BY CLASS.CLASS_IDX DESC)ATAB)BTAB WHERE RNUM>=#{startnum} AND RNUM<=#{endnum}]]>
+</select>
+<select id="cc_totalCntTeacherCurrentClassList" parameterType="int" resultType="int">
+	<![CDATA[SELECT COUNT(*) FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (SELECT * FROM CLASS
+	WHERE CLASS.TEA_IDX=#{tea_idx} AND CLASS_ENDDATE>=TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-')
+	AND CLASS_STARTDATE<=TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-') ORDER BY CLASS_IDX DESC)ATAB)BTAB]]>
+</select>
+<!-- CYBERCAMPUS TEACHER OLD CLASS -->
+<select id="cc_gotoTeacherOldClassList" parameterType="MAP" resultType="gyum_02.cybercampus.Model.CC_ClassDTO">
+	<![CDATA[SELECT BTAB.* FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (SELECT CLASS.*,TEACHER.TEA_NAME, CLASS_CHECK.CLASS_CHECK FROM CLASS, TEACHER, CLASS_CHECK
+	WHERE CLASS.TEA_IDX=#{tea_idx} AND CLASS.TEA_IDX=TEACHER.TEA_IDX AND CLASS_ENDDATE<TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-')
+	AND CLASS.CLASS_IDX=CLASS_CHECK.CLASS_IDX ORDER BY CLASS.CLASS_IDX DESC)ATAB)BTAB WHERE RNUM>=#{startnum} AND RNUM<=#{endnum}]]>
+</select>
+<select id="cc_totalTeacherOldClassList" parameterType="Integer" resultType="int">
+	<![CDATA[SELECT COUNT(CLASS_IDX) FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (SELECT CLASS.*, CLASS_CHECK.CLASS_CHECK FROM CLASS, CLASS_CHECK
+	WHERE CLASS.TEA_IDX=#{tea_idx} AND CLASS.CLASS_IDX=CLASS_CHECK.CLASS_IDX AND CLASS_ENDDATE<TO_NUMBER(TO_CHAR(SYSDATE,'YYYY-MM-DD'),'9999G99G99','NLS_NUMERIC_CHARACTERS=,-')
+	ORDER BY CLASS.CLASS_IDX DESC)ATAB)BTAB]]>
+</select>
+</mapper>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="gyum_02.sugang">
+	<!-- searchbar -->
+	<select id="sgtotalCntSearchForThisClass" parameterType="Map"
+	resultType="Integer">
+	SELECT COUNT(*) FROM class,teacher,class_check
+		where class.tea_idx=teacher.tea_idx and class_check=1 and class.class_idx=class_check.class_idx
+	<choose>
+		<when test="searchHow=='subject'">
+			AND class_subject LIKE '%'||#{searchWhat}||'%'
+		</when>
+		<when test="searchHow=='teacher'">
+			AND tea_name LIKE '%'||#{searchWhat}||'%'
+		</when>
+		<when test="searchHow=='subjectNteacher'">
+			AND class_subject LIKE '%'||#{searchWhat}||'%' OR tea_name LIKE
+			'%'||#{searchWhat}||'%'
+		</when>
+	</choose>
+</select>
+	<select id="sgsearchForThisUser"  resultType="gyum_02.sugang.model.SugangDTO">
+	SELECT BTAB.* FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (select distinct
+	class_check.class_idx,class.subject_num,class_subject,classroom,class_time,class_startdate,class_enddate,teacher.tea_name
+	from class,teacher,class_check
+	where class.tea_idx=teacher.tea_idx and class_check=1 and
+	class.class_idx=class_check.class_idx
+	<choose>
+		<when test="searchHow=='subject'">
+			AND class_subject LIKE '%'||#{searchWhat}||'%'
+		</when>
+		<when test="searchHow=='teacher'">
+			AND tea_name LIKE '%'||#{searchWhat}||'%'
+		</when>
+		<when test="searchHow=='subjectNteacher'">
+			AND class_subject LIKE '%'||#{searchWhat}||'%' OR tea_name LIKE
+			'%'||#{searchWhat}||'%'
+		</when>
+	</choose>
+		order by class_idx desc)ATAB)BTAB
+		WHERE RNUM<![CDATA[>=]]>#{startnum}
+		AND RNUM<![CDATA[<=]]>#{endnum}
+	</select>
+	<!-- permit class list count -->
+	<select id="sugangTotalCnt" resultType="int">
+		select distinct count(*)
+		from class,teacher,class_check
+		where class.tea_idx=teacher.tea_idx and class_check=1 and class.class_idx=class_check.class_idx
+	</select>
+	<!-- permit class list -->
+	<select id="sugangList" resultType="gyum_02.sugang.model.SugangDTO">
+		<![CDATA[SELECT BTAB.* FROM (SELECT ROWNUM AS RNUM, ATAB.* FROM (
+                        select distinct class_check.class_idx,class.subject_num,class_subject,classroom,class_time,class_startdate,class_enddate,teacher.tea_name
+		                  from class,teacher,class_check
+		                  where class.tea_idx=teacher.tea_idx and class_check=1 and class.class_idx=class_check.class_idx order by class_idx desc)ATAB)BTAB
+                    WHERE RNUM>=#{startnum} AND RNUM<=#{endnum}]]>
+	</select>
+	<!-- student name to stu_idx Search -->
+	<select id="SearchStu_idx" parameterType="String" resultType="gyum_02.member.model.My_memberStudentDTO">
+		select stu_idx from student where stu_id=#{id}
+	</select>
+	<select id="stuInfoList" parameterType="String" resultType="gyum_02.sugang.model.StudentInfoDTO">
+		select stu_id,stu_name,stu_tel,stu_email,stu_school from student where stu_id=#{id}
+	</select>
+</mapper>

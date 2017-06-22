@@ -1,0 +1,138 @@
+@CHARSET "UTF-8";
+body{
+	background-color: white;
+}
+.ul_search{
+	border:1px solid #dedede;
+	width:900px;
+	margin-bottom:40px;
+	padding-right:40px;
+}
+/* li_title */
+.li_title{
+	font-size:22px;
+	margin-bottom:20px;
+	margin-top:10px;
+}
+/* li_accept */
+.li_accept{
+
+}
+.li_accept > span > label, .li_order_by > span > label, .li_week > span > label{
+	float:left;
+	width:100px;
+	text-align:center;
+	margin:0px auto;
+	padding:14px;
+	height:14px;
+	font-size:14px;
+	height:100%;
+	border-right:1px solid #dedede;
+}
+.ul_accept, .ul_week, .ul_order_by{
+	border:1px solid #dedede;
+	padding:10px;
+}
+.span_accept_need, .span_accept_ok, .span_order_number, .span_order_subject_name, .span_order_class_subject,
+.span_order_tea_name, .span_order_class_startdate, .span_week_class_day_0, .span_week_class_day_1,
+.span_week_class_day_2, .span_week_class_day_3{
+	float:left;
+}
+.span_accept_need, .span_accept_ok, .span_order_number, .span_order_subject_name, .span_order_class_subject,
+.span_order_tea_name, .span_order_class_startdate, .span_week_class_day_0, .span_week_class_day_1,
+.span_week_class_day_2, .span_week_class_day_3, .span_week_class_day_4, .span_accept_no,
+.span_order_class_enddate{
+	width: 120px;
+	margin-right:4px;
+	margin-top:2px;
+}
+.span_accept_need, .span_order_number, .span_week_class_day_0{
+	margin-left:20px;
+}
+
+.ul_accept{
+}
+
+
+.span_accept_ok{
+}
+.span_accept_no{
+}
+
+/* li_order_by */
+.li_order_by{
+
+}
+.ul_order_by{
+}
+.span_order_number{
+
+}
+.span_order_subject_name{
+}
+.span_order_class_subject{
+
+}
+.span_order_tea_name{
+}
+.span_order_class_startdate{
+
+}
+.span_order_class_enddate{
+
+}
+
+/* li_week */
+.li_week{
+
+}
+.ul_week{
+}
+.span_week_class_day_0{
+
+}
+.span_week_class_day_1{
+
+}
+.span_week_class_day_2{
+
+}
+.span_week_class_day_3{
+
+}
+.span_week_class_day_4{
+
+}
+#submit_class_search{
+	margin-top:10px;
+	margin-bottom:20px;
+}
+
+/* button */
+.span_accept_button{
+	margin-top:20px;
+	margin-bottom:10px;
+}
+
+#table_management{
+	width:900px;
+	margin-bottom:200px;
+	margin-top:10px;
+}
+#table_management th{
+	text-align:center;
+}
+#table_management td > input{
+	height:18px;
+	padding:5px;
+	font-size:8px;
+	margin:0px;
+	vertical-align: top;
+}
+#table_management td{
+	margin:0px;
+	padding:0px;
+}
+.checkbox_class{
+
+}

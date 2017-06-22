@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="gyum_02.sgFavor">
+	<select id="sgFavorList" parameterType="int" resultType="gyum_02.sugang.model.SgFavorDTO">
+		select class.class_idx,class.subject_num,class_subject,classroom,class_time,class_startdate,class_enddate,teacher.tea_name
+		from cart,teacher,class
+		where stu_idx=#{stu_idx} and class.tea_idx=teacher.tea_idx and cart.class_idx=class.class_idx
+	</select>
+	<delete id="sgFavorDelete" parameterType="MAP">
+		delete from cart
+		where stu_idx=#{user_idx} and class_idx=#{class_idx}
+	</delete>
+	<insert id="sgFavorInsert" parameterType="MAP">
+		insert into cart values(cart_cart_idx.nextval,#{user_idx},#{select_idx})
+	</insert>
+	<select id="insertchk" parameterType="MAP" resultType="gyum_02.sugang.model.SgFavorDTO">
+		select stu_idx from cart where stu_idx=#{user_idx} and class_idx=#{select_idx}
+	</select>
+</mapper>

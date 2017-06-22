@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="gyum_02.master">
+<!-- STUDENT -->
+	<insert id="mp_student_insert" parameterType="gyum_02.masterpage.model.StudentDTO">
+		insert into student values(student_stu_idx.nextval,'-','-',0,'-',0,#{stu_name},#{stu_tel},#{stu_email},sysdate,sysdate,#{stu_school},#{stu_grade},0,#{par_idx})
+	</insert>
+	<update id="mp_student_update" parameterType="gyum_02.masterpage.model.StudentDTO">
+		update student set stu_tel=#{stu_tel},stu_email=#{stu_email},stu_school=#{stu_school},stu_grade=#{stu_grade},par_idx=#{par_idx} where stu_idx=#{stu_idx}
+	</update>
+	<delete id="mp_student_delete" parameterType="int">
+		delete from student where stu_idx=#{stu_idx}
+	</delete>
+	<select id="mp_student_allList" resultType="gyum_02.masterpage.model.StudentDTO">
+		select * from student order by stu_idx desc
+	</select>
+	<select id="mp_student_select" parameterType="String" resultType="gyum_02.masterpage.model.StudentDTO">
+		select * from student where stu_name=#{keyword} order by stu_idx desc
+	</select>
+	<select id="mp_student_info" parameterType="int" resultType="gyum_02.masterpage.model.StudentDTO">
+		select * from student where stu_idx=#{stu_idx}
+	</select>
+	<select id="mp_student_info2" parameterType="String" resultType="gyum_02.masterpage.model.StudentDTO">
+		select * from student where stu_name=#{stu_name}
+	</select>
+	<select id="mp_student_par" parameterType="String" resultType="gyum_02.masterpage.model.StudentDTO">
+		select par_idx from student where stu_name=#{stu_name}
+	</select>
+	<select id="mp_student_totalCnt" resultType="integer">
+		select count(*) from student
+	</select>
+	<select id="mp_student_paging" parameterType="map" resultType="gyum_02.masterpage.model.StudentDTO">
+		select * from
+		(select rownum as rnum,a.* from
+		(select * from student order by stu_idx)a)b
+		where rnum<![CDATA[>=]]>#{startnum} 
+		and rnum<![CDATA[<=]]>#{endnum} 
+	</select>
+	<select id="mp_student_paging_stu_idx" parameterType="map" resultType="gyum_02.masterpage.model.StudentDTO">
+		select * from
+		(select rownum as rnum,a.* from
+		(select * from student where stu_idx=#{stu_idx} order by stu_idx)a)b
+		where rnum<![CDATA[>=]]>#{startnum} 
+		and rnum<![CDATA[<=]]>#{endnum} 
+	</select>
+<!-- TEACHER -->
+	<insert id="mp_teacher_insert" parameterType="gyum_02.masterpage.model.TeacherDTO">
+		insert into teacher values(teacher_tea_idx.nextval,'-','-',0,'-',0,#{tea_name},#{tea_tel},#{tea_email},#{subject_num},sysdate,sysdate,0)
+	</insert>
+	<update id="mp_teacher_update" parameterType="gyum_02.masterpage.model.TeacherDTO">
+		update teacher set tea_id=#{tea_id},tea_pwd=#{tea_pwd},pwd_q_idx=#{pwd_q_idx},tea_pwd_a=#{tea_pwd_a},tea_birth=#{tea_birth},tea_name=#{tea_name},tea_tel=#{tea_tel},tea_email=#{tea_email},subject_num=#{subject_num} where tea_idx=#{tea_idx}
+	</update>
+	<delete id="mp_teacher_delete" parameterType="int">
+		delete from teacher where tea_idx=#{tea_idx}
+	</delete>
+	<select id="mp_teacher_allList" resultType="gyum_02.masterpage.model.TeacherDTO">
+		select * from teacher order by tea_idx desc
+	</select>
+	<select id="mp_teacher_select" parameterType="String" resultType="gyum_02.masterpage.model.TeacherDTO">
+		select * from teacher where tea_name=#{keyword} order by tea_idx desc
+	</select>
+	<select id="mp_teacher_info" parameterType="int" resultType="gyum_02.masterpage.model.TeacherDTO">
+		select * from teacher where tea_idx=#{tea_idx}
+	</select>
+	<select id="mp_teacher_subject" parameterType="int" resultType="gyum_02.masterpage.model.TeacherDTO">
+		select * from teacher where subject_num=#{subject_num}
+	</select>
+	<select id="mp_teacher_name" parameterType="String" resultType="gyum_02.masterpage.model.TeacherDTO">
+		select * from teacher where tea_name = #{tea_name}
+	</select>
+	<select id="mp_teacher_totalCnt" resultType="integer">
+		select count(*) from teacher
+	</select>
+	<select id="mp_teacher_paging" parameterType="map" resultType="gyum_02.masterpage.model.TeacherDTO">
+		select * from
+		(select rownum as rnum,a.* from
+		(select * from teacher order by tea_idx)a)b
+		where rnum<![CDATA[>=]]>#{startnum} 
+		and rnum<![CDATA[<=]]>#{endnum} 
+	</select>
+<!-- PARENT -->
+	<select id="mp_parent_paging" parameterType="map" resultType="gyum_02.masterpage.model.ParentDTO">
+		select * from
+		(select rownum as rnum,a.* from
+		(select * from parent order by par_idx)a)b
+		where rnum<![CDATA[>=]]>#{startnum} 
+		and rnum<![CDATA[<=]]>#{endnum} 
+	</select>
+	<select id="mp_parent_totalCnt" resultType="integer">
+		select count(*) from parent
+	</select>
+	<insert id="mp_parent_insert" parameterType="gyum_02.masterpage.model.ParentDTO">
+		insert into parent values(parent_par_idx.nextval,'-','-',0,'-',#{par_name},#{par_tel},#{par_email},sysdate)
+	</insert>
+	<update id="mp_parent_update" parameterType="gyum_02.masterpage.model.ParentDTO">
+		update parent set par_id=#{par_id},par_pwd=#{par_pwd},pwd_q_idx=#{pwd_q_idx},par_pwd_a=#{par_pwd_a},par_name=#{par_name},par_tel=#{par_tel},par_email=#{par_email} where par_idx=#{par_idx}
+	</update>
+	<delete id="mp_parent_delete" parameterType="int">
+		delete from parent where par_idx=#{par_idx}
+	</delete>
+	<select id="mp_parent_allList" resultType="gyum_02.masterpage.model.ParentDTO">
+		select * from parent order by par_idx desc
+	</select>
+	<select id="mp_parent_select" parameterType="String" resultType="gyum_02.masterpage.model.ParentDTO">
+		select * from parent where par_name=#{keyword} order by par_idx desc
+	</select>
+	<select id="mp_parent_info" parameterType="int" resultType="gyum_02.masterpage.model.ParentDTO">
+		select * from parent where par_idx=#{par_idx}
+	</select>
+<!-- CLASS_STUDENT -->
+	<select id="mp_cs_select" parameterType="int" resultType="gyum_02.masterpage.model.Class_studentDTO">
+		select class_idx from class_student where stu_idx=#{stu_idx}
+	</select>
+	<insert id="mp_cs_insert" parameterType="gyum_02.masterpage.model.Class_studentDTO">
+		insert into class_student values(#{class_idx},#{stu_idx})
+	</insert>
+	<delete id="mp_cs_delete" parameterType="gyum_02.masterpage.model.Class_studentDTO">
+		delete from class_student where stu_idx=#{stu_idx} and class_idx=#{class_idx}
+	</delete>
+	<delete id="mp_cs_delete_student" parameterType="int">
+		delete from class_student where stu_idx=#{stu_idx}
+	</delete>
+	<select id="mp_cs_stu_idx_paging" parameterType="map" resultType="gyum_02.masterpage.model.Class_studentDTO">
+		select * from
+		(select rownum as rnum,a.* from
+		(select stu_idx from class_student where class_idx=#{class_idx} order by stu_idx)a)b
+		where rnum<![CDATA[>=]]>#{startnum} 
+		and rnum<![CDATA[<=]]>#{endnum} 
+	</select>
+	<select id="mp_cs_stu_idx" parameterType="integer" resultType="gyum_02.masterpage.model.Class_studentDTO">
+		select stu_idx from class_student where class_idx=#{class_idx} order by class_idx
+	</select>
+	<select id="mp_cs_totalCnt" parameterType="integer" resultType="integer">
+		select count(*) from class_student where class_idx=#{class_idx}
+	</select>
+<!-- CLASS -->
+	<select id="mp_c_totalCnt" parameterType="integer" resultType="integer">
+		select count(*) from class where class_idx=#{class_idx}
+	</select>
+	<select id="mp_c_select" parameterType="int" resultType="gyum_02.masterpage.model.ClassDTO">
+		select * from class where class_idx=#{class_idx} 
+	</select>
+	<select id="mp_c_select_tea_idx" parameterType="integer" resultType="gyum_02.masterpage.model.ClassDTO">
+		select tea_idx from class where class_idx=#{class_idx} 
+	</select>
+	<select id="mp_c_select_with_sn" parameterType="int" resultType="gyum_02.masterpage.model.ClassDTO">
+		select * from class where subject_num=#{subject_num}
+	</select>
+	<select id="mp_c_allList" resultType="gyum_02.masterpage.model.ClassDTO">
+		select * from class
+	</select>
+	<select id="mp_c_tea_idx" parameterType="int" resultType="gyum_02.masterpage.model.ClassDTO">
+		select tea_idx from class where subject_num=#{subject_num} order by tea_idx
+	</select>
+	<delete id="mp_c_delete" parameterType="int">
+		delete * from class where tea_idx=#{tea_idx}
+	</delete>
+	<select id="mp_c_select_tea_idx_paging" parameterType="map" resultType="gyum_02.masterpage.model.ClassDTO">
+		select * from
+		(select rownum as rnum,a.* from
+		(select tea_idx from class where class_idx=#{class_idx} order by tea_idx)a)b
+		where rnum<![CDATA[>=]]>#{startnum} 
+		and rnum<![CDATA[<=]]>#{endnum} 
+	</select>
+	<select id="mp_c_allList_where_tea_idx" parameterType="int" resultType="gyum_02.masterpage.model.ClassDTO">
+		select * from class where tea_idx=#{tea_idx} order by class_idx
+	</select>
+<!-- SUBJECT_NUM -->
+	<select id="mp_sn_select" resultType="gyum_02.masterpage.model.Subject_numDTO">
+		select * from subject_num
+	</select>
+	<select id="mp_sn_select_name" parameterType="int" resultType="gyum_02.masterpage.model.Subject_numDTO">
+		select subject_name where subject_num=#{subject_num}
+	</select>
+<!-- ATTEND -->
+	<select id="mp_attend_someone" resultType="gyum_02.masterpage.model.AttendDTO">
+		select * from attend where stu_idx=#{stu_idx} order by attend_date
+	</select>
+	<select id="mp_attend_getinfo" resultType="gyum_02.masterpage.model.AttendDTO" parameterType="gyum_02.masterpage.model.AttendDTO">
+		select * from attend where stu_idx=#{stu_idx} and class_idx=#{class_idx} order by attend_date
+	</select>
+	<delete id="mp_attend_delete" parameterType="int">
+		delete from attend where stu_idx=#{stu_idx} 
+	</delete>
+<!-- ATTEND_ATTENDANCE -->
+	<select id="mp_aa_aaa" parameterType="int" resultType="String">
+		select a_a_attendance from attend_attendance where a_a_idx=#{a_a_idx} 
+	</select>
+<!-- LETTER -->
+	<insert id="mp_letter_insert" parameterType="gyum_02.masterpage.model.LetterDTO">
+		insert into letter values(letter_letter_idx.nextval,#{letter_subject},#{letter_content},#{letter_sender},#{letter_sendee},sysdate,#{letter_readdate})
+	</insert>
+	<select id="mp_letter_totalCnt" resultType="int">
+		select count(*) from letter
+	</select>
+	<select id="mp_letter_allList" parameterType="map" resultType="gyum_02.masterpage.model.LetterDTO">
+		select * from
+		(select rownum as rnum,a.* from
+		(select * from letter where letter_sender='master' order by letter_senddate desc)a)b
+		where rnum<![CDATA[>=]]>#{startnum} 
+		and rnum<![CDATA[<=]]>#{endnum} 
+	</select>
+	<select id="mp_letter_dateCheck" parameterType="map" resultType="Integer">
+		select letter_idx from letter where letter_sender <![CDATA[=]]> 'master' 
+											and letter_senddate <![CDATA[=]]> letter_readdate 
+											and letter_senddate <![CDATA[>=]]> #{minnum}
+											and letter_senddate <![CDATA[<=]]> #{maxnum}+1
+											order by letter_senddate 
+	</select>
+	<select id="mp_letter_content" parameterType="int" resultType="gyum_02.masterpage.model.LetterDTO">
+		select * from letter where letter_idx=#{letter_idx}
+	</select>
+	
+	<select id="mp_student_get_idx" parameterType="String" resultType="integer">
+		select stu_idx from student where stu_id=#{stu_id}
+	</select>
+	
+</mapper>

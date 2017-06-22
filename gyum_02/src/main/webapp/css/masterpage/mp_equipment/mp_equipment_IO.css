@@ -1,0 +1,155 @@
+@CHARSET "UTF-8";
+table th{
+	text-align:center;
+}
+#span_IO_do{
+	border:2px solid #918c8c;
+}
+#div_equipment_IO_input{
+	margin-bottom:20px;
+}
+#div_equipment_IO_input input{
+	margin-right:10px;
+	width:100px;
+	border:1px solid #eaeff6;
+	box-shadow: 4px 4px 4px 0px #cccccc;
+}
+
+.tr_equipment_1{
+	
+	height:20px;
+}
+.tr_equipment_0{
+	background:#ffffff;
+}
+#table_equipment{
+	width:800px;
+	border:1px solid #eaeff6;
+	box-shadow: 4px 4px 4px 0px #cccccc;
+}
+.tr_hollow_2{
+	background:#c9d0d8;
+	color:white;
+	height:30px;
+}
+.tr_hollow_1{
+
+	height:30px;
+}
+.tr_hollow_0{
+	background:#ffffff;
+	height:30px;
+}
+.td_e_s_modi_date{
+	width:140px;
+}
+.td_e_s_in_out{
+	width:100px;
+}
+.td_equip_code{
+	width:100px;
+}
+.td_equip_name{
+	width:240px;
+}
+.td_equip_s_size{
+	width:100px;
+}
+.td_e_s_in_out_num{
+	width:100px;
+}
+
+.modal-content{
+	width:540px;
+	padding:30px;
+	height:400px;
+}
+#form_modal{
+	padding:0px;
+	height:200px;
+}
+#form_modal > ul{
+	padding:0px;
+}
+#form_modal > ul > li{
+	margin-bottom:10px;
+}
+.article_label{
+	width:70px;
+	font-size:15px;
+	height:33px;
+}
+.article_data{
+	width:430px;
+	height:40px;
+}
+
+
+.article_data select{
+	width:200px;
+	margin-right:10px;
+}
+.article_data input[type='number']{
+	width:50px;
+}
+.article_data input[type='text']{
+	height:33px;
+	vertical-align:top;
+}
+.modal_li_equip_name{
+	
+}
+.modal_li_equip_code{
+
+}
+.modal_li_equip_code .article_label{
+	float:left;
+	width:200px;
+	margin-right:14px;
+	text-align:left;
+	text-indent:10px;
+}
+.modal_li_equip_code .article_data{
+	height:33px;
+}
+#modal_equip_code{
+	height:32px;
+}
+.modal_li_day .article_label{
+	float:left;
+	width:200px;
+	margin-right:14px;
+	text-align:left;
+	text-indent:10px;
+}
+
+.modal_li_day .article_data{
+	height:33px;
+}
+.modal_li_equip_s_size .article_label{
+	float:left;
+	width:40px;
+	margin-right:14px;
+	text-align:left;
+	text-indent:10px;
+}
+
+.modal_li_e_s_in_out_num .article_label{
+	float:left;
+	width:58px;
+	margin-right:14px;
+	text-align:left;
+	text-indent:10px;
+	
+}
+
+.modal_li_equip_s_size .article_data, .modal_li_e_s_in_out_num .article_data{
+	width:160px;
+	float:left;
+}
+#modal_e_s_in_out_num{
+	width:105px;
+}
+.modal_li_equip_s_size input[type='number']{
+	width:60px;
+}

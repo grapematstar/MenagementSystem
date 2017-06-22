@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:websocket="http://www.springframework.org/schema/websocket"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+	http://www.springframework.org/schema/websocket 
+	http://www.springframework.org/schema/websocket/spring-websocket.xsd">
+
+	<!-- config -->
+	<context:component-scan base-package="gyum_02" use-default-filters="false">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+	
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="104857600"/>
+	</bean>
+	
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+		<property name="url" value="jdbc:oracle:thin:@yongstudy.iptime.org:9000:orcl"/>
+		<property name="username" value="project02_02"/>
+		<property name="password" value="project02_02"/>
+	</bean>
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	<bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="configLocation" value="classpath:/mybatis-config.xml"/>
+	</bean>
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactoryBean"/>
+	</bean>
+	
+	<!-- service -->
+	<!-- lnh -->
+	<bean id="my_stu_classDao" class="gyum_02.my_student.model.my_stu_ClassDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="my_stu_subjectDao" class="gyum_02.my_student.model.my_stu_SubjectDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="my_stu_classevalDao" class="gyum_02.my_student.model.my_stu_ClassEvalDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="my_stu_classevalanswerDao" class="gyum_02.my_student.model.my_stu_ClassEvalAnswerDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="my_stu_attendDao" class="gyum_02.my_student.model.my_stu_AttendDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="my_stu_attendattendanceDao" class="gyum_02.my_student.model.my_stu_AttendAttendanceDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="my_stu_classstudentDao" class="gyum_02.my_student.model.my_stu_ClassStudentDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="my_stu_timetableDao" class="gyum_02.my_student.model.my_stu_TimetableDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="my_score_schoolscoreDao" class="gyum_02.my_score.model.my_score_SchoolScoreDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="my_score_schoolgoalDao" class="gyum_02.my_score.model.my_score_SchoolGoalDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="my_stu_studentDao" class="gyum_02.my_student.model.my_stu_StudentDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="my_score_teacherDao" class="gyum_02.my_score.model.my_score_TeacherDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="my_score_studentscoreDao" class="gyum_02.my_score.model.my_score_StudentScoreDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="my_stu_letterDao" class="gyum_02.my_student.model.my_stu_LetterDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	
+	<!-- ldh -->
+	<bean id="My_memberStudentDao" class="gyum_02.member.model.My_memberStudentDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	
+	<bean id="My_memberParentDao" class="gyum_02.member.model.My_memberParentDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	
+	<bean id="My_memberTeacherDao" class="gyum_02.member.model.My_memberTeacherDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	
+	<bean id="My_QnaDao" class="gyum_02.mypage.model.My_QnaDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	
+	<bean id="My_ClassDao" class="gyum_02.mypage.model.My_ClassDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	
+	<bean id="My_memberLoyalDao" class="gyum_02.member.model.My_memberLoyalDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	
+	<bean id="My_classCheckDao" class="gyum_02.mypage.model.My_ClassCheckDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	
+	<bean id="My_classTestDao" class="gyum_02.mypage.model.My_ClassTestDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	
+	<bean id="My_classHistoryDao" class="gyum_02.mypage.model.My_StuClassDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	
+	<!-- bw -->
+	<bean id="SugangDAO" class="gyum_02.sugang.model.SugangDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean id="sgFavorDAO" class="gyum_02.sugang.model.SgfavorDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean id="sgPaymentDAO" class="gyum_02.sugang.model.SgPaymentDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	
+	<!-- CYBERCAMPUS START jmg -->
+	<bean id="cc_NoticeDAO" class="gyum_02.cybercampus.Model.CC_NoticeDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean id="cc_EpilogueDAO" class="gyum_02.cybercampus.Model.CC_EpilogueDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean id="cc_FreeBBSDAO" class="gyum_02.cybercampus.Model.CC_FreeBBSDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean id="cc_InfoPlanDAO" class="gyum_02.cybercampus.Model.CC_InfoPlanDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean id="cc_ClassDAO" class="gyum_02.cybercampus.Model.CC_ClassDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean id="cc_AttendDAO" class="gyum_02.cybercampus.Model.CC_AttendDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean id="cc_QnADAO" class="gyum_02.cybercampus.Model.CC_QnADAOImple">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean id="cc_RepositoryDAO" class="gyum_02.cybercampus.Model.CC_RepositoryDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"/>	
+	</bean>
+	<bean id="cybercampusDownload" class="gyum_02.cybercampus.Controller.CC_DownloadView"/>
+	<!-- CYBERCAMPUS END --> 
+	
+	<!-- jsy -->
+	<bean id="studentDao" class="gyum_02.masterpage.model.StudentDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>	
+	<bean id="teacherDao" class="gyum_02.masterpage.model.TeacherDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="parentDao" class="gyum_02.masterpage.model.ParentDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="class_studentDao" class="gyum_02.masterpage.model.Class_studentDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="classDao" class="gyum_02.masterpage.model.ClassDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="subject_numDao" class="gyum_02.masterpage.model.Subject_numDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="attendDao" class="gyum_02.masterpage.model.AttendDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>	
+	<bean id="attend_attendanceDao" class="gyum_02.masterpage.model.Attend_attendanceDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="letterDao" class="gyum_02.masterpage.model.LetterDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	
+	<!-- ksh -->
+	<bean class="gyum_02.notice.model.NoticeDAOImple" id="noticeDao">
+		<constructor-arg ref="sqlSessionTemplate" />
+	</bean>
+	<bean class="gyum_02.Freebbs.model.FreebbsDAOImple" id="freebbsDao">
+		<constructor-arg ref="sqlSessionTemplate" />
+	</bean>
+	<bean class="gyum_02.main_Search.model.SearchDAOImple" id="searchDao">
+		<constructor-arg ref="sqlSessionTemplate" />
+	</bean>
+   <bean class="gyum_02.main_TeacherInfo.Model.TeacherInfoDAOImple" id="teacherInfoDao">
+      <constructor-arg ref="sqlSessionTemplate" />
+   </bean>
+	
+	<!-- bsj -->
+	<bean id="studentDAO" class="gyum_02.mp_academyStatus.model.mp_StudentDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="teacherDAO" class="gyum_02.mp_academyStatus.model.mp_TeacherDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="salesDAO" class="gyum_02.mp_academyStatus.model.mp_SalesDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="qnaDAO" class="gyum_02.mp_qnaManagement.model.mp_QnaDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="equipmentDAO" class="gyum_02.mp_equipment.model.mp_EquipmentDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="evalDAO" class="gyum_02.masterpage.model._____.evalDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="classManagementDAO" class="gyum_02.masterpage.model._____.mp_ClassManagementDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="SSSSStudyroomDAO" class="gyum_02.masterpage.model._____.SSSSStudyroomDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	<bean id="CccccccDAO" class="gyum_02.cybercampus.Model.CccccccDAOImple">
+		<constructor-arg ref="sqlSessionTemplate"></constructor-arg>
+	</bean>
+	
+	<!-- lhg -->
+	<bean class="gyum_02.study.model.createStudyDAOImple" id="createStudyDao">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean class="gyum_02.scheduler.controller.SchedulerImple" id="eventManagerDao">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean class="gyum_02.study.model.memberStudyDAOImple" id="memberSDao">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean class="gyum_02.study.model.infoStudyDAOImple" id="infoSDao">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean class="gyum_02.study.model.bbsnameStudyDAOImple" id="bbsnameSDao">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean class="gyum_02.study.model.leaderStudyDAOImple" id="leaderSDao">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean class="gyum_02.study.model.study_bbsDAOImple" id="studybbsDao">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean class="gyum_02.study.model.votebbsDAOImple" id="vbbsDao">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean class="gyum_02.study.model.voteconListDAOImple" id="vclDao">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean class="gyum_02.study.model.voterDAOImple" id="voterDao">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean class="gyum_02.study.model.recruitStudyDAOImple" id="rsDao">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean class="gyum_02.study.model.inqStudyDAOImple" id="inqDao">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean class="gyum_02.study.model.reqStudyDAOImple" id="reqDao">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean class="gyum_02.study.model.filebbsDAOImple" id="filebbsDao">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean class="gyum_02.study.model.fileuploadDAOImple" id="fileuploadDao">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+	<bean class="gyum_02.study.fileDownloadView.DownloadView" id="yongDown"/>
+	<bean class="gyum_02.study.model.studyroomDAOImple" id="srDao">
+		<constructor-arg ref="sqlSessionTemplate"/>
+	</bean>
+		
+	<!-- view -->
+	<bean id="jsonMapper" class="com.fasterxml.jackson.databind.ObjectMapper" />
+	<bean id="yongJson" class="org.springframework.web.servlet.view.json.MappingJackson2JsonView">
+	 	<property name="objectMapper" ref="jsonMapper" />
+ 
+	</bean>
+	
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/"></property>
+		<property name="suffix" value=".jsp"></property>
+		<property name="order" value="1"/>
+	</bean>
+	
+	<bean class="org.springframework.web.servlet.view.BeanNameViewResolver">
+		<property name="order" value="0"/>
+	</bean>
+	
+</beans>

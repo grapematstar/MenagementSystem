@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<mappers>
+		<mapper resource="sql/my_studentSql.xml"/>
+		<mapper resource="sql/my_scoreSql.xml"/>
+		
+		<mapper resource="sql/mypageSql.xml"/>
+		<mapper resource="sql/memberSql.xml"/>
+		
+		<mapper resource="sql/masterSql.xml"/>	
+		
+		<mapper resource="sql/sugangSql.xml"/>
+		<mapper resource="sql/sgFavorSql.xml"/>
+		<mapper resource="sql/sgPaymentSql.xml"/>
+		
+		<mapper resource="sql/cyberCampusSql.xml"/>
+		
+		<mapper resource="sql/noticeSql.xml"/>
+		<mapper resource="sql/freebbsSql.xml"/>
+		<mapper resource="sql/searchSql.xml"/>
+		<mapper resource="sql/teacherInfoSql.xml"/>
+		
+		<mapper resource="sql/mp_academyStatusSql.xml"/>
+		<mapper resource="sql/mp_qnaSql.xml"/>
+		<mapper resource="sql/mp_equipmentSql.xml"/>
+		<mapper resource="sql/master__________Sql.xml"/>
+		
+		<mapper resource="sql/createStudySql.xml"/>
+		<mapper resource="sql/scheduler.xml"/>
+	</mappers>
+</configuration>
