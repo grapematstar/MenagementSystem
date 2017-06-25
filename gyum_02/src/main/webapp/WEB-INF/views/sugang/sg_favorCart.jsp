@@ -289,7 +289,7 @@ function closeModal(){
 			"checkArray" : checkboxValues
 		};
 		if (checkboxValues != '') {
-			if (window.confirm("레알?")) {
+			if (window.confirm("정말 삭제하시겠습니까?")) {
 				$.ajax({
 					url : "../gyum_02/sg_favorcartDel.do",
 					type : 'GET',

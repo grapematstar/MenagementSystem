@@ -94,7 +94,7 @@ function cancelSub(){
 	
 	var totalData = {"userid":userid, "listValues":listValues, "context":context};
 	if(listValues!=''){
-		if (window.confirm("레알?")) {
+		if (window.confirm("정말 취소하시겠습니까?")) {
 			$.ajax({
 				url : "../gyum_02/sg_paymentDel.do",
 				type : 'GET',
