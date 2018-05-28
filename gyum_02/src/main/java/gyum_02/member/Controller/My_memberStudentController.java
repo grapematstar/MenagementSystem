@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.catalina.deploy.MultipartDef;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.DefaultNamingPolicy;
 import org.springframework.stereotype.Controller;

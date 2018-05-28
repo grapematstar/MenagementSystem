@@ -1,319 +1,320 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="gyum_02.study">
-	<insert parameterType="gyum_02.study.model.createStudyDTO" id="studyinsert">
-		insert into study values(study_study_idx.nextval,#{study_subject},#{study_content},#{study_id},#{study_maxnum},#{study_directory},#{study_lastday},'-',#{study_public},'0',sysdate)
-	</insert>	
-	<update id="studymodi"  parameterType="gyum_02.study.model.createStudyDTO">
-		update study set study_subject=#{study_subject} and study_content=#{study_content} and study_maxnum=#{study_maxnum} and study_directory=#{study_directory} and study_lastday=#{study_lastday} and study_public=#{study_public} where study_idx=#{study_idx}
-	</update>
-	<select id="get_study_total" resultType="int"> 
-		 select COUNT(*) from study where study_public=0 order by study_idx desc
-	</select>	
-	<select id="studylist" parameterType="map" resultType="gyum_02.study.model.createStudyDTO"> 
-	select * from (select rownum as rnum,a.* from (select * from study where study_public=0 order by study_idx desc)a)b where rnum<![CDATA[>=]]>#{startnum} and rnum<![CDATA[<=]]>#{endnum}		
-	</select>	
-	<insert parameterType="gyum_02.study.model.memberStudyDTO" id="create_study_member">
-		insert into study_member values(#{study_idx},#{stu_idx},#{stu_id},#{stu_name})
-	</insert>	
-	<insert parameterType="gyum_02.study.model.leaderStudyDTO" id="create_study_leader">
-		insert into study_leader values(#{study_idx},#{study_leader},#{study_seconleader})		
-	</insert>	
-	<select id="study_getidx" resultType="int" parameterType="gyum_02.study.model.createStudyDTO">
-		select study_idx from study where study_id=#{study_id} and study_subject=#{study_subject} and study_content=#{study_content} and study_maxnum=#{study_maxnum} and study_directory=#{study_directory}
-	</select>	
-	<select id="getstudy" parameterType="Hashmap" resultType="String">
-		select stu_name from study_member where study_idx=#{idx} and stu_idx=#{s_idx}
-	</select>	
-	<insert id="study_info_add" parameterType="gyum_02.study.model.infoStudyDTO">
-		insert into study_info values(#{stu_idx},#{stu_id},#{stu_name},0,0,0,0)
-	</insert>	
-	<update id="info_study_update" parameterType="gyum_02.study.model.infoStudyDTO">
-		update study_info set study_info_alltime=#{study_info_alltime}, study_info_playing=#{study_info_playing} where stu_idx=#{stu_idx}
-	</update>	
-	<select id="get_info_study" parameterType="int" resultType="gyum_02.study.model.infoStudyDTO"  >
-		select study_info_alltime, study_info_playing from study_info where stu_idx=#{stu_idx}
-	</select>	
-	<insert id="study_bbsname" parameterType="gyum_02.study.model.bbsnameStudyDTO">
-		insert into study_bbsname values(#{study_idx},#{study_bbsname},#{study_bbsref})
-	</insert>	
-	<select id="bbsnamelist_get" parameterType="int" resultType="gyum_02.study.model.bbsnameStudyDTO">
-		select study_bbsname, study_bbsref from study_bbsname where study_idx=#{study_idx} order by study_bbsref
-	</select>	
-	<select id="getstudyleaderinfo" parameterType="int" resultType="gyum_02.study.model.leaderStudyDTO">
-		select * from study_leader where study_idx=#{study_idx}
-	</select>	
-	<select id="getstudymemberinfo" parameterType="int" resultType="gyum_02.study.model.memberStudyDTO">
-		select * from study_member where study_idx=#{study_idx}
-	</select>	
-	<select id="getstudyinfo" parameterType="int" resultType="gyum_02.study.model.createStudyDTO"> 
-		select * from study where study_idx=#{idx}
-	</select>
-	<select id="getmaxref" resultType="int" parameterType="int">
-		select max(study_bbsref) from study_bbsname where study_idx=#{study_idx}
-	</select>	
-	<delete id="bbsnamedel" parameterType="gyum_02.study.model.bbsnameStudyDTO">
-		delete study_bbsname where study_idx=#{study_idx} and study_bbsref=#{study_bbsref}
-	</delete>	
-	<select id="getstudymeminfo" parameterType="int" resultType="gyum_02.study.model.infoStudyDTO">
-		select * from study_info where stu_idx=#{stu_idx}
-	</select>	
-	<delete id="study_memdel" parameterType="gyum_02.study.model.memberStudyDTO">
-		delete study_member where study_idx=#{study_idx} and stu_id=#{stu_id}
-	</delete>	
-	<select id="getstudymem_info" parameterType="String" resultType="gyum_02.study.model.infoStudyDTO">
-		select * from study_info where stu_id=#{stu_id}
-	</select>	
-	<select id="study_membercheck" parameterType="map" resultType="gyum_02.study.model.memberStudyDTO">
-		select stu_idx from study_member where stu_id=#{stu_id} and study_idx=#{study_idx}
-	</select>
-	<insert id="study_member_add" parameterType="gyum_02.study.model.memberStudyDTO" >
-		insert into study_member values(#{study_idx},#{stu_idx},#{stu_id},#{stu_name})
-	</insert>	
-	<update id="study_infoupdate" parameterType="String">
-		update study_info set study_info_alltime=study_info_alltime+1, study_info_playing=study_info_playing+1  where stu_id=#{stu_id}			
-	</update>	
-	<select id="getstudentinfo" parameterType="String" resultType="gyum_02.member.model.My_memberStudentDTO">
-		select stu_idx, stu_name from student where stu_id=#{stu_id} 
-	</select>		
-	<update id="study_member_deport" parameterType="String">
-		update study_info set study_info_playing=study_info_playing-1, study_info_deportnum=study_info_deportnum+1 where stu_id=#{stu_id}
-	</update>	
-	<select id="getmaxmember" parameterType="int" resultType="int">
-		select study_maxnum from study where study_idx=#{study_idx}
-	</select>
-	<select id="getmembercount" parameterType="int" resultType="int">
-		select count(*) from study where study_idx=#{study_idx}
-	</select>	
-	<select id="get_studybbslist_total" resultType="int" parameterType="gyum_02.study.model.study_bbsDTO">
-		select count(*) from study_bbs where study_idx=#{study_idx} and study_bbsref=#{study_bbsref} and study_bbslev=0 order by study_bbssunbun desc
-	</select>
-	
-	<select id="study_bbslist" parameterType="gyum_02.study.model.study_bbsDTO" resultType="gyum_02.study.model.study_bbsDTO" >
-		select * from study_bbs where study_idx=#{study_idx} and study_bbsref=#{study_bbsref} and study_bbslev=0 order by study_bbssunbun desc
-	</select>
-	<select id="study_bbslist_get" parameterType="map" resultType="gyum_02.study.model.study_bbsDTO" >
-		select * from (select rownum as rnum,a.* from (select * from study_bbs where study_idx=#{study_idx} and study_bbsref=#{study_bbsref} and study_bbslev=0 order by study_bbssunbun desc)a)b where rnum<![CDATA[>=]]>#{startnum} and rnum<![CDATA[<=]]>#{endnum}	
-	</select>
-	<select id="getmaxbbssunbun" resultType="int" parameterType="gyum_02.study.model.study_bbsDTO">
-		select max(study_bbssunbun) from study_bbs where study_idx=#{study_idx} and study_bbsref=#{study_bbsref}
-	</select>	
-	<insert id="study_bbsinsert" parameterType="gyum_02.study.model.study_bbsDTO">
-		insert into study_bbs values(study_bbs_study_bbsidx.nextval,#{study_idx},#{study_bbsref},#{stu_id},#{stu_name},#{study_bbssubject},#{study_bbscontent},0,#{study_bbssunbun},0,sysdate)
-	</insert>
-	<select id="studybbscontent" parameterType="int" resultType="gyum_02.study.model.study_bbsDTO">
-		select * from study_bbs where study_bbsidx=#{study_bbsidx}
-	</select>
-	<select id="studybbsreply" parameterType="int" resultType="gyum_02.study.model.study_bbsDTO"> 
-		select * from study_bbs where study_idx=#{study_idx} and study_bbslev=1 and study_bbsref=#{study_bbsref} and study_bbssunbun=#{study_bbssunbun} order by study_bbsreply_sunbun 
-	</select>
-	<select id="bbsnameGet" parameterType="gyum_02.study.model.bbsnameStudyDTO" resultType="String">
-		select study_bbsname from study_bbsname where study_bbsref=#{study_bbsref} and study_idx=#{study_idx}
-	</select>
-	<select id="getmaxreplysunbun" resultType="int" parameterType="gyum_02.study.model.study_bbsDTO">
-		select max(study_bbsreply_sunbun) from study_bbs where study_idx=#{study_idx} and study_bbsref=#{study_bbsref} and study_bbslev=1
-	</select>	
-	<insert id="study_bbsreplyinsert" parameterType="gyum_02.study.model.study_bbsDTO">
-		insert into study_bbs values(study_bbs_study_bbsidx.nextval,#{study_idx},#{study_bbsref},#{stu_id},#{stu_name},'-',#{study_bbscontent},1,0,#{study_bbsreply_sunbun},sysdate)
-	</insert>	
-	<!-- vote -->	
-	<insert id="votebbs_insert" parameterType="gyum_02.study.model.votebbsDTO">
-	 	insert into study_votebbs values(study_votebbs_study_votebbsidx.nextval,#{study_idx},#{study_votebbsref},#{stu_id},#{stu_name},#{study_votebbssubject},#{study_votebbscontent},0,#{study_votebbssunbun},0,1,sysdate) 
-	</insert>
-	<select id="getstudy_votebbsidx" parameterType="gyum_02.study.model.votebbsDTO" resultType="int">
-		select study_votebbsidx from study_votebbs where study_idx=#{study_idx} and study_votebbsref=#{study_votebbsref} and study_votebbssubject=#{study_votebbssubject} and study_votebbscontent=#{study_votebbscontent}
-	</select>
-	<select id="getstudy_votebbsref" parameterType="gyum_02.study.model.votebbsDTO" resultType="int">
-		select max(study_votebbsref) from study_votebbs where study_idx=#{study_idx}
-	</select>
-	<select id="votecon_insert" parameterType="gyum_02.study.model.voteconStudyDTO">
-		insert into study_votecon values(study_votecon_study_voteidx.nextval,#{study_idx},#{study_votebbsidx},#{study_votecontent},#{study_votenum})
-	</select>
-	<select id="vote_bbslist" parameterType="map" resultType="gyum_02.study.model.votebbsDTO">
-		select * from (select rownum as rnum,a.* from (select * from study_votebbs where study_idx=#{study_idx} and study_votebbslev=0 order by study_votebbsidx desc)a)b where rnum<![CDATA[>=]]>#{startnum} and rnum<![CDATA[<=]]>#{endnum}
-	</select>
-	<select id="study_votebbs_gettotal" parameterType="int" resultType="int">
-		select count(*) from study_votebbs where study_idx=#{study_idx} and study_votebbslev=0 order by study_votebbsidx desc
-	</select>
-	
-	
-	
-	<select id="getvotebbscon" resultType="gyum_02.study.model.votebbsDTO" parameterType="int">
-		select * from study_votebbs where study_votebbsidx=#{study_votebbsidx}
-	</select>
-	<select id="getvoteconlist" parameterType="map" resultType="gyum_02.study.model.voteconStudyDTO">
-		select * from study_votecon where study_idx=#{study_idx} and study_votebbsidx=#{study_votebbsidx} order by study_voteidx
-	</select>	
-	<update id="updatevotenum" parameterType="gyum_02.study.model.voteconStudyDTO">
-		update study_votecon set study_votenum=study_votenum+1 where study_voteidx=#{study_voteidx}
-	</update>
-	<insert id="voterinsert" parameterType="map">
-		insert into study_votebbs_voter values(#{study_votebbsidx},#{study_voteidx},#{stu_idx},#{stu_id})
-	</insert>
-	<select id="getvoterstu_id" parameterType="map" resultType="gyum_02.study.model.voterDTO">
-		select * from study_votebbs_voter where stu_id=#{stu_id} and study_votebbsidx=#{study_votebbsidx}
-	</select>
-	<select id="study_voter_check" parameterType="map" resultType="int">
-		select study_voteidx from study_votebbs_voter where stu_id=#{stu_id} and study_votebbsidx=#{study_votebbsidx}
-	</select>
-	<delete id="voter_cancel" parameterType="map">
-		delete study_votebbs_voter where stu_id=#{stu_id} and study_votebbsidx=#{study_votebbsidx} and study_voteidx=#{study_voteidx}
-	</delete>
-	<update id="vote_cancel" parameterType="map">
-		update study_votecon set study_votenum=study_votenum-1 where study_votebbsidx=#{study_votebbsidx} and study_voteidx=#{study_voteidx}
-	</update>		
-	<select id="getstudy_idx" parameterType="int" resultType="gyum_02.study.model.memberStudyDTO">
-		select study_idx from study_member where stu_idx=#{stu_idx} order by study_idx desc
-	</select>
-	
-	<!-- recruit -->	
-	<select id="study_recruit_list" parameterType="map" resultType="gyum_02.study.model.recruitStudyDTO">
-		select * from (select rownum as rnum,a.* from (select * from study_recruit order by study_recruitidx desc)a)b where rnum<![CDATA[>=]]>#{startnum} and rnum<![CDATA[<=]]>#{endnum}		
-	</select>
-	<select id="get_study_recruit_total" resultType="int">
-		select count(*) from study_recruit 
-	</select>
-	<insert id="study_recruit_insert" parameterType="gyum_02.study.model.recruitStudyDTO">
-		insert into study_recruit values(study_recruitidx_idx.nextval,#{stu_idx},#{stu_id},#{study_recruit_subject},#{study_recruit_content},#{study_recruit_directory},#{study_recruit_maxnum},0,1,#{study_recruit_term},#{study_recruit_weeknum},#{study_recruit_onoff},#{study_recruit_usetime},1,sysdate)
-	</insert>
-	<select id="getstudy_recruit" parameterType="int" resultType="gyum_02.study.model.recruitStudyDTO" >
-		select * from study_recruit where study_recruitidx=#{study_recruitidx}
-	</select>
-	<update id="study_recruit_req_update_plus" parameterType="int">
-		update study_recruit set study_recruit_reqmem=study_recruit_reqmem+1 where study_recruitidx=#{study_recruitidx}
-	</update>
-	<update id="study_recruit_req_update_minus" parameterType="int">
-		update study_recruit set study_recruit_reqmem=study_recruit_reqmem-1 where study_recruitidx=#{study_recruitidx}
-	</update>
-	<select id="getstudy_recruitidx" parameterType="gyum_02.study.model.recruitStudyDTO" resultType="int">
-		select study_recruitidx from study_recruit where study_recruit_subject=#{study_recruit_subject} and study_recruit_content=#{study_recruit_content} and study_recruit_directory=#{study_recruit_directory} and stu_id=#{stu_id} and stu_idx=#{stu_idx} and study_recruit_weeknum=#{study_recruit_weeknum}	
-	</select>
-	<select id="getstudy_recruitlist" parameterType="int" resultType="gyum_02.study.model.recruitStudyDTO">
-		select * from study_recruit where stu_idx=#{stu_idx} order by study_recruit_writedate desc
-	</select>	
-	<select id="getstudy_make_recruitlist" parameterType="String" resultType="gyum_02.study.model.recruitStudyDTO">
-		select * from study_recruit where stu_id=#{id} order by study_recruit_writedate desc
-	</select>
-	<!-- STUDY FILEBBS -->	
-	<select id="study_filebbs_List" parameterType="map" resultType="gyum_02.study.model.filebbsDTO">
-		 select * from (select rownum as rnum,a.* from ( select * from study_filebbs where study_idx=#{study_idx} and study_filebbslev=0 order by study_filebbsidx desc )a)b where rnum<![CDATA[>=]]>#{startnum} and rnum<![CDATA[<=]]>#{endnum}
-	</select>
-	<select id="study_filebbs_gettotal" parameterType="int" resultType="int">
-		 select count(*) from study_filebbs where study_idx=#{study_idx} and study_filebbslev=0 order by study_filebbsidx desc 
-	</select>
-	<insert id="makelistfilebbs" parameterType="gyum_02.study.model.filebbsDTO"> 
-		insert into study_filebbs values(study_filebbs_study_filebbsidx.nextval,#{study_idx},#{stu_id},#{stu_name},#{study_filebbssubject},#{study_filebbscontent},0,#{study_filebbssunbun},0,sysdate) 
-	</insert>	
-	<select id="getfilebbsContent" parameterType="int" resultType="gyum_02.study.model.filebbsDTO"> 
-		select * from study_filebbs where study_filebbsidx=#{study_filebbsidx} and study_filebbslev=0 
-	</select>	
-	<select id="getmaxfilebbssunbun" parameterType="gyum_02.study.model.filebbsDTO" resultType="int"> 
-		select max(study_filebbssunbun) from study_filebbs where study_idx=#{study_idx} and study_filebbslev=0 
-	</select>	
-	<update id="study_filebbsupdate" parameterType="gyum_02.study.model.filebbsDTO"> 
-		update study_filebbs set study_filebbssubject=#{study_filebbssubject}, study_filebbscontent=#{study_filebbscontent} where study_filebbsidx=#{study_filebbsidx} 
-	</update>	
-	<delete id="study_filebbsdel" parameterType="int"> 
-		delete from study_filebbs where study_filebbsidx=#{study_filebbsidx} 
-	</delete>	
-	<select id="getstudy_filebbsreply" parameterType="gyum_02.study.model.filebbsDTO" resultType="gyum_02.study.model.filebbsDTO"> 
-		select * from study_filebbs where study_filebbslev=1 and study_idx=#{study_idx} and study_filebbssunbun=#{study_filebbssunbun} order by study_filebbsreply_sunbun 
-	</select>	
-	<insert id="makestudy_filebbsreply" parameterType="gyum_02.study.model.filebbsDTO"> 
-		insert into study_filebbs values(study_filebbs_study_filebbsidx.nextval,#{study_idx},#{stu_id},#{stu_name},'-',#{study_filebbscontent},1,#{study_filebbssunbun},#{study_filebbsreply_sunbun},sysdate)
-	</insert>	
-	<select id="getmaxreplysunbun2" parameterType="gyum_02.study.model.filebbsDTO" resultType="int"> 
-		select max(study_filebbsreply_sunbun) from study_filebbs where study_idx=#{study_idx} and study_filebbssunbun=#{study_filebbssunbun} and study_filebbslev=1 
-	</select>	
-	<update id="study_filebbsreplyupdate" parameterType="gyum_02.study.model.filebbsDTO"> 
-	update study_filebbs set study_filebbscontent=#{study_filebbscontent} where study_filebbsidx=#{study_filebbsidx} 
-	</update>	
-	<select id="getstudy_fileupload_s_f_idx" parameterType="gyum_02.study.model.filebbsDTO"> 
-		select study_filebbsidx from study_filebbs where study_filebbscontent=#{study_filebbscontent} and study_filebbssunbun=#{study_filebbssunbun} and study_idx=#{study_idx} 
-	</select>	
-	<!-- FILEUPLOAD -->	
-	<insert id="study_fileupload_insert" parameterType="gyum_02.study.model.fileuploadDTO"> 
-		insert into study_fileupload values(study_fileupload_s_f_idx.nextval,#{study_idx},#{s_f_filebbssunbun},#{s_f_filepath},#{s_f_filename}) 
-	</insert>	
-	
-	<!-- inq -->
-	<insert id="study_recruit_inq_send" parameterType="gyum_02.study.model.inqStudyDTO">
-		insert into study_inq values(study_inq_idx.nextval,#{study_recruitidx},0,#{study_inq_reciver},#{study_inq_sender},#{study_inq_content},#{stu_id},1,sysdate)
-	</insert>	
-	<select id="study_reciv_list" parameterType="String" resultType="gyum_02.study.model.inqStudyDTO">
-		select distinct study_recruitidx, study_idx, study_inq_sender from study_inq where study_inq_reciver=#{stu_id} order by study_idx
-	</select>
-	<select id="study_inq_list(study_idx)" parameterType="gyum_02.study.model.inqStudyDTO" resultType="gyum_02.study.model.inqStudyDTO">
-		select * from study_inq where study_idx=#{study_idx} and study_inq_sender=#{study_inq_sender} and study_inq_reciver=#{study_inq_reciver} order by study_inqidx
-	</select>
-	<select id="study_inq_list(recruitidx)" parameterType="gyum_02.study.model.inqStudyDTO" resultType="gyum_02.study.model.inqStudyDTO">
-		select * from study_inq where study_recruitidx=#{study_recruitidx} and study_inq_sender=#{study_inq_sender} and study_inq_reciver=#{study_inq_reciver} order by study_inqidx
-	</select>
-	<update id="update_study_readcheck(recruitidx)" parameterType="gyum_02.study.model.inqStudyDTO">
-		update study_inq set study_inq_readcheck=0 where study_recruitidx=#{study_recruitidx} and study_inq_sender=#{study_inq_sender} and study_inq_reciver=#{study_inq_reciver} and study_inqidx=#{study_inqidx}
-	</update>
-	<update id="update_study_readcheck(studyidx)" parameterType="gyum_02.study.model.inqStudyDTO">
-		update study_inq set study_inq_readcheck=0 where study_idx=#{study_idx} and study_inq_sender=#{study_inq_sender} and study_inq_reciver=#{study_inq_reciver} and study_inqidx=#{study_inqidx}
-	</update>
-	<select id="study_send_list" parameterType="String" resultType="gyum_02.study.model.inqStudyDTO">
-		select distinct study_recruitidx, study_idx, study_inq_reciver from study_inq where study_inq_sender=#{stu_id} order by study_idx
-	</select>
-	<!-- req -->
-	<select id="study_req_check" parameterType="gyum_02.study.model.reqStudyDTO" resultType="gyum_02.study.model.reqStudyDTO">
-		select * from study_req where study_recruitidx=#{study_recruitidx} and stu_idx=#{stu_idx}
-	</select>
-	<insert id="study_req_add" parameterType="gyum_02.study.model.reqStudyDTO" >
-		insert into study_req values(#{study_recruitidx},#{stu_idx},#{study_req_accept},sysdate)
-	</insert>
-	<select id="study_req_list" parameterType="int" resultType="gyum_02.study.model.reqStudyDTO">
-		select * from study_req where stu_idx=#{idx}  order by study_req_date
-	</select>
-	<delete id="sutdy_req_del" parameterType="gyum_02.study.model.reqStudyDTO" >
-		delete study_req where stu_idx=#{stu_idx} and study_recruitidx=#{study_recruitidx}
-	</delete>
-	<select id="study_recru_reqlist" parameterType="int" resultType="gyum_02.study.model.reqStudyDTO">
-		select * from study_req where study_recruitidx=#{study_recruitidx} and study_req_accept=0
-	</select>
-	
-	<!-- studyroom -->
-	<select id="studyroom_list" parameterType="int" resultType="gyum_02.study.model.studyroomDTO">
-		select * from studyroom	where studyroom_reserv_date=#{date} order by studyroom_name, studyroom_reserv_hour
-	</select>
-	<insert id="studyroom_reserv" parameterType="gyum_02.study.model.studyroomDTO">
-	 	insert into studyroom values(studyroom_idx.nextval,#{studyroom_name},#{studyroom_id},#{studyroom_note},#{studyroom_reserv_date},#{studyroom_reserv_hour},#{studyroom_usetime},#{studyroom_tel},sysdate)
-	</insert>
-	<select id="get_studyroom_reserv" parameterType="gyum_02.study.model.studyroomDTO" resultType="gyum_02.study.model.studyroomDTO" >
-		select * from studyroom where studyroom_reserv_date=#{studyroom_reserv_date} and studyroom_reserv_hour=#{studyroom_reserv_hour} order by studyroom_writedate
-	</select>
-	<delete id="studyroom_reserv_cencel" parameterType="gyum_02.study.model.studyroomDTO">
-		delete studyroom where studyroom_reserv_date=#{studyroom_reserv_date} and studyroom_reserv_hour=#{studyroom_reserv_hour} and studyroom_id=#{studyroom_id}
-	</delete>
-	<select id="getstudyroom_list" parameterType="String" resultType="gyum_02.study.model.studyroomDTO">
-		select * from studyroom where studyroom_id=#{studyroom_id} order by studyroom_writedate desc,studyroom_reserv_hour
-	</select>
-	<delete id="studyroom_reserv_cencel2" parameterType="int">
-		delete studyroom where studyroom_idx=#{studyroom_idx}
-	</delete>
-	<select id="studyroom_totalCnt" resultType="integer"> select count(*) from studyroom </select>
-	<select id="studyroom_paging_all" parameterType="map" resultType="gyum_02.study.model.studyroomDTO">
-		select * from (select rownum as rnum,a.* from (select * from studyroom order by studyroom_reserv_date, studyroom_reserv_hour )a)b where rnum
-		<![CDATA[>=]]>#{startnum} and rnum
-		<![CDATA[<=]]>#{endnum} 
-	</select>
-	<delete id="studyroom_garbage" parameterType="int"> 
-		delete from studyroom where studyroom_idx = #{studyroom_idx} 
-	</delete>
-	<select id="studyroom_paging_search" parameterType="map" resultType="gyum_02.study.model.studyroomDTO">
-			select * from (select rownum as rnum,a.* from (select * from studyroom where studyroom_id=#{studyroom_id} order by studyroom_reserv_date, studyroom_reserv_hour )a)b where rnum
-			<![CDATA[>=]]>#{startnum} and rnum
-		<![CDATA[<=]]>#{endnum} 
-	</select>
-	<select id="studyroom_totalCnt_withId" parameterType="String" resultType="integer"> 
-		select count(*) from studyroom where studyroom_id=#{studyroom_id} 
-	</select>
-	<update id="study_CloseOrStart" parameterType="map"> 
+    <resultMap type="gyum_02.study.model.createStudyDTO" id="createStudy">
+    
+    </resultMap>
+    <insert parameterType="gyum_02.study.model.createStudyDTO" id="studyinsert">
+        insert into study values(study_study_idx.nextval,#{study_subject},#{study_content},#{study_id},#{study_maxnum},#{study_directory},#{study_lastday},'-',#{study_public},'0',sysdate)
+    </insert>    
+    <update id="studymodi"  parameterType="gyum_02.study.model.createStudyDTO">
+        update study set study_subject=#{study_subject} and study_content=#{study_content} and study_maxnum=#{study_maxnum} and study_directory=#{study_directory} and study_lastday=#{study_lastday} and study_public=#{study_public} where study_idx=#{study_idx}
+    </update>
+    <select id="get_study_total" resultType="int"> 
+         select COUNT(*) from study where study_public=0 order by study_idx desc
+    </select>    
+    <select id="studylist" parameterType="map" resultType="gyum_02.study.model.createStudyDTO"> 
+    select * from (select rownum as rnum,a.* from (select * from study where study_public=0 order by study_idx desc)a)b where rnum<![CDATA[>=]]>#{startnum} and rnum<![CDATA[<=]]>#{endnum}        
+    </select>    
+    <insert parameterType="gyum_02.study.model.memberStudyDTO" id="create_study_member">
+        insert into study_member values(#{study_idx},#{stu_idx},#{stu_id},#{stu_name})
+    </insert>    
+    <insert parameterType="gyum_02.study.model.leaderStudyDTO" id="create_study_leader">
+        insert into study_leader values(#{study_idx},#{study_leader},#{study_seconleader})        
+    </insert>    
+    <select id="study_getidx" resultType="int" parameterType="gyum_02.study.model.createStudyDTO">
+        select study_idx from study where study_id=#{study_id} and study_subject=#{study_subject} and study_content=#{study_content} and study_maxnum=#{study_maxnum} and study_directory=#{study_directory}
+    </select>    
+    <select id="getstudy" parameterType="Hashmap" resultType="String">
+        select stu_name from study_member where study_idx=#{idx} and stu_idx=#{s_idx}
+    </select>    
+    <insert id="study_info_add" parameterType="gyum_02.study.model.infoStudyDTO">
+        insert into study_info values(#{stu_idx},#{stu_id},#{stu_name},0,0,0,0)
+    </insert>    
+    <update id="info_study_update" parameterType="gyum_02.study.model.infoStudyDTO">
+        update study_info set study_info_alltime=#{study_info_alltime}, study_info_playing=#{study_info_playing} where stu_idx=#{stu_idx}
+    </update>    
+    <select id="get_info_study" parameterType="int" resultType="gyum_02.study.model.infoStudyDTO"  >
+        select study_info_alltime, study_info_playing from study_info where stu_idx=#{stu_idx}
+    </select>    
+    <insert id="study_bbsname" parameterType="gyum_02.study.model.bbsnameStudyDTO">
+        insert into study_bbsname values(#{study_idx},#{study_bbsname},#{study_bbsref})
+    </insert>    
+    <select id="bbsnamelist_get" parameterType="int" resultType="gyum_02.study.model.bbsnameStudyDTO">
+        select study_bbsname, study_bbsref from study_bbsname where study_idx=#{study_idx} order by study_bbsref
+    </select>    
+    <select id="getstudyleaderinfo" parameterType="int" resultType="gyum_02.study.model.leaderStudyDTO">
+        select * from study_leader where study_idx=#{study_idx}
+    </select>    
+    <select id="getstudymemberinfo" parameterType="int" resultType="gyum_02.study.model.memberStudyDTO">
+        select * from study_member where study_idx=#{study_idx}
+    </select>    
+    <select id="getstudyinfo" parameterType="int" resultType="gyum_02.study.model.createStudyDTO"> 
+        select * from study where study_idx=#{idx}
+    </select>
+    <select id="getmaxref" resultType="int" parameterType="int">
+        select max(study_bbsref) from study_bbsname where study_idx=#{study_idx}
+    </select>    
+    <delete id="bbsnamedel" parameterType="gyum_02.study.model.bbsnameStudyDTO">
+        delete study_bbsname where study_idx=#{study_idx} and study_bbsref=#{study_bbsref}
+    </delete>    
+    <select id="getstudymeminfo" parameterType="int" resultType="gyum_02.study.model.infoStudyDTO">
+        select * from study_info where stu_idx=#{stu_idx}
+    </select>    
+    <delete id="study_memdel" parameterType="gyum_02.study.model.memberStudyDTO">
+        delete study_member where study_idx=#{study_idx} and stu_id=#{stu_id}
+    </delete>    
+    <select id="getstudymem_info" parameterType="String" resultType="gyum_02.study.model.infoStudyDTO">
+        select * from study_info where stu_id=#{stu_id}
+    </select>    
+    <select id="study_membercheck" parameterType="map" resultType="gyum_02.study.model.memberStudyDTO">
+        select stu_idx from study_member where stu_id=#{stu_id} and study_idx=#{study_idx}
+    </select>
+    <insert id="study_member_add" parameterType="gyum_02.study.model.memberStudyDTO" >
+        insert into study_member values(#{study_idx},#{stu_idx},#{stu_id},#{stu_name})
+    </insert>    
+    <update id="study_infoupdate" parameterType="String">
+        update study_info set study_info_alltime=study_info_alltime+1, study_info_playing=study_info_playing+1  where stu_id=#{stu_id}            
+    </update>    
+    <select id="getstudentinfo" parameterType="String" resultType="gyum_02.member.model.My_memberStudentDTO">
+        select stu_idx, stu_name from student where stu_id=#{stu_id} 
+    </select>        
+    <update id="study_member_deport" parameterType="String">
+        update study_info set study_info_playing=study_info_playing-1, study_info_deportnum=study_info_deportnum+1 where stu_id=#{stu_id}
+    </update>    
+    <select id="getmaxmember" parameterType="int" resultType="int">
+        select study_maxnum from study where study_idx=#{study_idx}
+    </select>
+    <select id="getmembercount" parameterType="int" resultType="int">
+        select count(*) from study where study_idx=#{study_idx}
+    </select>    
+    <select id="get_studybbslist_total" resultType="int" parameterType="gyum_02.study.model.study_bbsDTO">
+        select count(*) from study_bbs where study_idx=#{study_idx} and study_bbsref=#{study_bbsref} and study_bbslev=0 order by study_bbssunbun desc
+    </select>
+    
+    <select id="study_bbslist" parameterType="gyum_02.study.model.study_bbsDTO" resultType="gyum_02.study.model.study_bbsDTO" >
+        select * from study_bbs where study_idx=#{study_idx} and study_bbsref=#{study_bbsref} and study_bbslev=0 order by study_bbssunbun desc
+    </select>
+    <select id="study_bbslist_get" parameterType="map" resultType="gyum_02.study.model.study_bbsDTO" >
+        select * from (select rownum as rnum,a.* from (select * from study_bbs where study_idx=#{study_idx} and study_bbsref=#{study_bbsref} and study_bbslev=0 order by study_bbssunbun desc)a)b where rnum<![CDATA[>=]]>#{startnum} and rnum<![CDATA[<=]]>#{endnum}    
+    </select>
+    <select id="getmaxbbssunbun" resultType="int" parameterType="gyum_02.study.model.study_bbsDTO">
+        select max(study_bbssunbun) from study_bbs where study_idx=#{study_idx} and study_bbsref=#{study_bbsref}
+    </select>    
+    <insert id="study_bbsinsert" parameterType="gyum_02.study.model.study_bbsDTO">
+        insert into study_bbs values(study_bbs_study_bbsidx.nextval,#{study_idx},#{study_bbsref},#{stu_id},#{stu_name},#{study_bbssubject},#{study_bbscontent},0,#{study_bbssunbun},0,sysdate)
+    </insert>
+    <select id="studybbscontent" parameterType="int" resultType="gyum_02.study.model.study_bbsDTO">
+        select * from study_bbs where study_bbsidx=#{study_bbsidx}
+    </select>
+    <select id="studybbsreply" parameterType="int" resultType="gyum_02.study.model.study_bbsDTO"> 
+        select * from study_bbs where study_idx=#{study_idx} and study_bbslev=1 and study_bbsref=#{study_bbsref} and study_bbssunbun=#{study_bbssunbun} order by study_bbsreply_sunbun 
+    </select>
+    <select id="bbsnameGet" parameterType="gyum_02.study.model.bbsnameStudyDTO" resultType="String">
+        select study_bbsname from study_bbsname where study_bbsref=#{study_bbsref} and study_idx=#{study_idx}
+    </select>
+    <select id="getmaxreplysunbun" resultType="int" parameterType="gyum_02.study.model.study_bbsDTO">
+        select max(study_bbsreply_sunbun) from study_bbs where study_idx=#{study_idx} and study_bbsref=#{study_bbsref} and study_bbslev=1
+    </select>    
+    <insert id="study_bbsreplyinsert" parameterType="gyum_02.study.model.study_bbsDTO">
+        insert into study_bbs values(study_bbs_study_bbsidx.nextval,#{study_idx},#{study_bbsref},#{stu_id},#{stu_name},'-',#{study_bbscontent},1,0,#{study_bbsreply_sunbun},sysdate)
+    </insert>    
+    <!-- vote -->    
+    <insert id="votebbs_insert" parameterType="gyum_02.study.model.votebbsDTO">
+         insert into study_votebbs values(study_votebbs_study_votebbsidx.nextval,#{study_idx},#{study_votebbsref},#{stu_id},#{stu_name},#{study_votebbssubject},#{study_votebbscontent},0,#{study_votebbssunbun},0,1,sysdate) 
+    </insert>
+    <select id="getstudy_votebbsidx" parameterType="gyum_02.study.model.votebbsDTO" resultType="int">
+        select study_votebbsidx from study_votebbs where study_idx=#{study_idx} and study_votebbsref=#{study_votebbsref} and study_votebbssubject=#{study_votebbssubject} and study_votebbscontent=#{study_votebbscontent}
+    </select>
+    <select id="getstudy_votebbsref" parameterType="gyum_02.study.model.votebbsDTO" resultType="int">
+        select max(study_votebbsref) from study_votebbs where study_idx=#{study_idx}
+    </select>
+    <select id="votecon_insert" parameterType="gyum_02.study.model.voteconStudyDTO">
+        insert into study_votecon values(study_votecon_study_voteidx.nextval,#{study_idx},#{study_votebbsidx},#{study_votecontent},#{study_votenum})
+    </select>
+    <select id="vote_bbslist" parameterType="map" resultType="gyum_02.study.model.votebbsDTO">
+        select * from (select rownum as rnum,a.* from (select * from study_votebbs where study_idx=#{study_idx} and study_votebbslev=0 order by study_votebbsidx desc)a)b where rnum<![CDATA[>=]]>#{startnum} and rnum<![CDATA[<=]]>#{endnum}
+    </select>
+    <select id="study_votebbs_gettotal" parameterType="int" resultType="int">
+        select count(*) from study_votebbs where study_idx=#{study_idx} and study_votebbslev=0 order by study_votebbsidx desc
+    </select>
+    
+    
+    
+    <select id="getvotebbscon" resultType="gyum_02.study.model.votebbsDTO" parameterType="int">
+        select * from study_votebbs where study_votebbsidx=#{study_votebbsidx}
+    </select>
+    <select id="getvoteconlist" parameterType="map" resultType="gyum_02.study.model.voteconStudyDTO">
+        select * from study_votecon where study_idx=#{study_idx} and study_votebbsidx=#{study_votebbsidx} order by study_voteidx
+    </select>    
+    <update id="updatevotenum" parameterType="gyum_02.study.model.voteconStudyDTO">
+        update study_votecon set study_votenum=study_votenum+1 where study_voteidx=#{study_voteidx}
+    </update>
+    <insert id="voterinsert" parameterType="map">
+        insert into study_votebbs_voter values(#{study_votebbsidx},#{study_voteidx},#{stu_idx},#{stu_id})
+    </insert>
+    <select id="getvoterstu_id" parameterType="map" resultType="gyum_02.study.model.voterDTO">
+        select * from study_votebbs_voter where stu_id=#{stu_id} and study_votebbsidx=#{study_votebbsidx}
+    </select>
+    <select id="study_voter_check" parameterType="map" resultType="int">
+        select study_voteidx from study_votebbs_voter where stu_id=#{stu_id} and study_votebbsidx=#{study_votebbsidx}
+    </select>
+    <delete id="voter_cancel" parameterType="map">
+        delete study_votebbs_voter where stu_id=#{stu_id} and study_votebbsidx=#{study_votebbsidx} and study_voteidx=#{study_voteidx}
+    </delete>
+    <update id="vote_cancel" parameterType="map">
+        update study_votecon set study_votenum=study_votenum-1 where study_votebbsidx=#{study_votebbsidx} and study_voteidx=#{study_voteidx}
+    </update>        
+    <select id="getstudy_idx" parameterType="int" resultType="gyum_02.study.model.memberStudyDTO">
+        select study_idx from study_member where stu_idx=#{stu_idx} order by study_idx desc
+    </select>
+    
+    <!-- recruit -->    
+    <select id="study_recruit_list" parameterType="map" resultType="gyum_02.study.model.recruitStudyDTO">
+        select * from (select rownum as rnum,a.* from (select * from study_recruit order by study_recruitidx desc)a)b where rnum<![CDATA[>=]]>#{startnum} and rnum<![CDATA[<=]]>#{endnum}        
+    </select>
+    <select id="get_study_recruit_total" resultType="int">
+        select count(*) from study_recruit 
+    </select>
+    <insert id="study_recruit_insert" parameterType="gyum_02.study.model.recruitStudyDTO">
+        insert into study_recruit values(study_recruitidx_idx.nextval,#{stu_idx},#{stu_id},#{study_recruit_subject},#{study_recruit_content},#{study_recruit_directory},#{study_recruit_maxnum},0,1,#{study_recruit_term},#{study_recruit_weeknum},#{study_recruit_onoff},#{study_recruit_usetime},1,sysdate)
+    </insert>
+    <select id="getstudy_recruit" parameterType="int" resultType="gyum_02.study.model.recruitStudyDTO" >
+        select * from study_recruit where study_recruitidx=#{study_recruitidx}
+    </select>
+    <update id="study_recruit_req_update_plus" parameterType="int">
+        update study_recruit set study_recruit_reqmem=study_recruit_reqmem+1 where study_recruitidx=#{study_recruitidx}
+    </update>
+    <update id="study_recruit_req_update_minus" parameterType="int">
+        update study_recruit set study_recruit_reqmem=study_recruit_reqmem-1 where study_recruitidx=#{study_recruitidx}
+    </update>
+    <select id="getstudy_recruitidx" parameterType="gyum_02.study.model.recruitStudyDTO" resultType="int">
+        select study_recruitidx from study_recruit where study_recruit_subject=#{study_recruit_subject} and study_recruit_content=#{study_recruit_content} and study_recruit_directory=#{study_recruit_directory} and stu_id=#{stu_id} and stu_idx=#{stu_idx} and study_recruit_weeknum=#{study_recruit_weeknum}    
+    </select>
+    <select id="getstudy_recruitlist" parameterType="int" resultType="gyum_02.study.model.recruitStudyDTO">
+        select * from study_recruit where stu_idx=#{stu_idx} order by study_recruit_writedate desc
+    </select>    
+    <select id="getstudy_make_recruitlist" parameterType="String" resultType="gyum_02.study.model.recruitStudyDTO">
+        select * from study_recruit where stu_id=#{id} order by study_recruit_writedate desc
+    </select>
+    <!-- STUDY FILEBBS -->    
+    <select id="study_filebbs_List" parameterType="map" resultType="gyum_02.study.model.filebbsDTO">
+         select * from (select rownum as rnum,a.* from ( select * from study_filebbs where study_idx=#{study_idx} and study_filebbslev=0 order by study_filebbsidx desc )a)b where rnum<![CDATA[>=]]>#{startnum} and rnum<![CDATA[<=]]>#{endnum}
+    </select>
+    <select id="study_filebbs_gettotal" parameterType="int" resultType="int">
+         select count(*) from study_filebbs where study_idx=#{study_idx} and study_filebbslev=0 order by study_filebbsidx desc 
+    </select>
+    <insert id="makelistfilebbs" parameterType="gyum_02.study.model.filebbsDTO"> 
+        insert into study_filebbs values(study_filebbs_study_filebbsidx.nextval,#{study_idx},#{stu_id},#{stu_name},#{study_filebbssubject},#{study_filebbscontent},0,#{study_filebbssunbun},0,sysdate) 
+    </insert>    
+    <select id="getfilebbsContent" parameterType="int" resultType="gyum_02.study.model.filebbsDTO"> 
+        select * from study_filebbs where study_filebbsidx=#{study_filebbsidx} and study_filebbslev=0 
+    </select>    
+    <select id="getmaxfilebbssunbun" parameterType="gyum_02.study.model.filebbsDTO" resultType="int"> 
+        select max(study_filebbssunbun) from study_filebbs where study_idx=#{study_idx} and study_filebbslev=0 
+    </select>    
+    <update id="study_filebbsupdate" parameterType="gyum_02.study.model.filebbsDTO"> 
+        update study_filebbs set study_filebbssubject=#{study_filebbssubject}, study_filebbscontent=#{study_filebbscontent} where study_filebbsidx=#{study_filebbsidx} 
+    </update>    
+    <delete id="study_filebbsdel" parameterType="int"> 
+        delete from study_filebbs where study_filebbsidx=#{study_filebbsidx} 
+    </delete>    
+    <select id="getstudy_filebbsreply" parameterType="gyum_02.study.model.filebbsDTO" resultType="gyum_02.study.model.filebbsDTO"> 
+        select * from study_filebbs where study_filebbslev=1 and study_idx=#{study_idx} and study_filebbssunbun=#{study_filebbssunbun} order by study_filebbsreply_sunbun 
+    </select>    
+    <insert id="makestudy_filebbsreply" parameterType="gyum_02.study.model.filebbsDTO"> 
+        insert into study_filebbs values(study_filebbs_study_filebbsidx.nextval,#{study_idx},#{stu_id},#{stu_name},'-',#{study_filebbscontent},1,#{study_filebbssunbun},#{study_filebbsreply_sunbun},sysdate)
+    </insert>    
+    <select id="getmaxreplysunbun2" parameterType="gyum_02.study.model.filebbsDTO" resultType="int"> 
+        select max(study_filebbsreply_sunbun) from study_filebbs where study_idx=#{study_idx} and study_filebbssunbun=#{study_filebbssunbun} and study_filebbslev=1 
+    </select>    
+    <update id="study_filebbsreplyupdate" parameterType="gyum_02.study.model.filebbsDTO"> 
+    update study_filebbs set study_filebbscontent=#{study_filebbscontent} where study_filebbsidx=#{study_filebbsidx} 
+    </update>    
+    <select id="getstudy_fileupload_s_f_idx" parameterType="gyum_02.study.model.filebbsDTO"> 
+        select study_filebbsidx from study_filebbs where study_filebbscontent=#{study_filebbscontent} and study_filebbssunbun=#{study_filebbssunbun} and study_idx=#{study_idx} 
+    </select>    
+    <!-- FILEUPLOAD -->    
+    <insert id="study_fileupload_insert" parameterType="gyum_02.study.model.fileuploadDTO"> 
+        insert into study_fileupload values(study_fileupload_s_f_idx.nextval,#{study_idx},#{s_f_filebbssunbun},#{s_f_filepath},#{s_f_filename}) 
+    </insert>    
+    
+    <!-- inq -->
+    <insert id="study_recruit_inq_send" parameterType="gyum_02.study.model.inqStudyDTO">
+        insert into study_inq values(study_inq_idx.nextval,#{study_recruitidx},0,#{study_inq_reciver},#{study_inq_sender},#{study_inq_content},#{stu_id},1,sysdate)
+    </insert>    
+    <select id="study_reciv_list" parameterType="String" resultType="gyum_02.study.model.inqStudyDTO">
+        select distinct study_recruitidx, study_idx, study_inq_sender from study_inq where study_inq_reciver=#{stu_id} order by study_idx
+    </select>
+    <select id="study_inq_list(study_idx)" parameterType="gyum_02.study.model.inqStudyDTO" resultType="gyum_02.study.model.inqStudyDTO">
+        select * from study_inq where study_idx=#{study_idx} and study_inq_sender=#{study_inq_sender} and study_inq_reciver=#{study_inq_reciver} order by study_inqidx
+    </select>
+    <select id="study_inq_list(recruitidx)" parameterType="gyum_02.study.model.inqStudyDTO" resultType="gyum_02.study.model.inqStudyDTO">
+        select * from study_inq where study_recruitidx=#{study_recruitidx} and study_inq_sender=#{study_inq_sender} and study_inq_reciver=#{study_inq_reciver} order by study_inqidx
+    </select>
+    <update id="update_study_readcheck(recruitidx)" parameterType="gyum_02.study.model.inqStudyDTO">
+        update study_inq set study_inq_readcheck=0 where study_recruitidx=#{study_recruitidx} and study_inq_sender=#{study_inq_sender} and study_inq_reciver=#{study_inq_reciver} and study_inqidx=#{study_inqidx}
+    </update>
+    <update id="update_study_readcheck(studyidx)" parameterType="gyum_02.study.model.inqStudyDTO">
+        update study_inq set study_inq_readcheck=0 where study_idx=#{study_idx} and study_inq_sender=#{study_inq_sender} and study_inq_reciver=#{study_inq_reciver} and study_inqidx=#{study_inqidx}
+    </update>
+    <select id="study_send_list" parameterType="String" resultType="gyum_02.study.model.inqStudyDTO">
+        select distinct study_recruitidx, study_idx, study_inq_reciver from study_inq where study_inq_sender=#{stu_id} order by study_idx
+    </select>
+    <!-- req -->
+    <select id="study_req_check" parameterType="gyum_02.study.model.reqStudyDTO" resultType="gyum_02.study.model.reqStudyDTO">
+        select * from study_req where study_recruitidx=#{study_recruitidx} and stu_idx=#{stu_idx}
+    </select>
+    <insert id="study_req_add" parameterType="gyum_02.study.model.reqStudyDTO" >
+        insert into study_req values(#{study_recruitidx},#{stu_idx},#{study_req_accept},sysdate)
+    </insert>
+    <select id="study_req_list" parameterType="int" resultType="gyum_02.study.model.reqStudyDTO">
+        select * from study_req where stu_idx=#{idx}  order by study_req_date
+    </select>
+    <delete id="sutdy_req_del" parameterType="gyum_02.study.model.reqStudyDTO" >
+        delete study_req where stu_idx=#{stu_idx} and study_recruitidx=#{study_recruitidx}
+    </delete>
+    <select id="study_recru_reqlist" parameterType="int" resultType="gyum_02.study.model.reqStudyDTO">
+        select * from study_req where study_recruitidx=#{study_recruitidx} and study_req_accept=0
+    </select>
+    
+    <!-- studyroom -->
+    <select id="studyroom_list" parameterType="int" resultType="gyum_02.study.model.studyroomDTO">
+        select * from studyroom    where studyroom_reserv_date=#{date} order by studyroom_name, studyroom_reserv_hour
+    </select>
+    <insert id="studyroom_reserv" parameterType="gyum_02.study.model.studyroomDTO">
+         insert into studyroom values(studyroom_idx.nextval,#{studyroom_name},#{studyroom_id},#{studyroom_note},#{studyroom_reserv_date},#{studyroom_reserv_hour},#{studyroom_usetime},#{studyroom_tel},sysdate)
+    </insert>
+    <select id="get_studyroom_reserv" parameterType="gyum_02.study.model.studyroomDTO" resultType="gyum_02.study.model.studyroomDTO" >
+        select * from studyroom where studyroom_reserv_date=#{studyroom_reserv_date} and studyroom_reserv_hour=#{studyroom_reserv_hour} order by studyroom_writedate
+    </select>
+    <delete id="studyroom_reserv_cencel" parameterType="gyum_02.study.model.studyroomDTO">
+        delete studyroom where studyroom_reserv_date=#{studyroom_reserv_date} and studyroom_reserv_hour=#{studyroom_reserv_hour} and studyroom_id=#{studyroom_id}
+    </delete>
+    <select id="getstudyroom_list" parameterType="String" resultType="gyum_02.study.model.studyroomDTO">
+        select * from studyroom where studyroom_id=#{studyroom_id} order by studyroom_writedate desc,studyroom_reserv_hour
+    </select>
+    <delete id="studyroom_reserv_cencel2" parameterType="int">
+        delete studyroom where studyroom_idx=#{studyroom_idx}
+    </delete>
+    <select id="studyroom_totalCnt" resultType="integer"> select count(*) from studyroom </select>
+    <select id="studyroom_paging_all" parameterType="map" resultType="gyum_02.study.model.studyroomDTO">
+        select * from (select rownum as rnum,a.* from (select * from studyroom order by studyroom_reserv_date, studyroom_reserv_hour )a)b where rnum
+        <![CDATA[>=]]>#{startnum} and rnum
+        <![CDATA[<=]]>#{endnum} 
+    </select>
+    <delete id="studyroom_garbage" parameterType="int"> 
+        delete from studyroom where studyroom_idx = #{studyroom_idx} 
+    </delete>
+    <select id="studyroom_paging_search" parameterType="map" resultType="gyum_02.study.model.studyroomDTO">
+            select * from (select rownum as rnum,a.* from (select * from studyroom where studyroom_id=#{studyroom_id} order by studyroom_reserv_date, studyroom_reserv_hour )a)b where rnum
+            <![CDATA[>=]]>#{startnum} and rnum
+        <![CDATA[<=]]>#{endnum} 
+    </select>
+    <select id="studyroom_totalCnt_withId" parameterType="String" resultType="integer"> 
+        select count(*) from studyroom where studyroom_id=#{studyroom_id} 
+    </select>
+    <update id="study_CloseOrStart" parameterType="map"> 
       update study set study_situ=#{study_situ} where study_idx=#{study_idx}
    </update>
    <select id="get_study_total_theme" parameterType="String" resultType="integer">
@@ -332,7 +333,7 @@
       (select * from study where study_subject like '%'||#{title}||'%' order by study_createdate)a)b where rnum
       <![CDATA[>=]]>#{startnum} and rnum <![CDATA[<=]]>#{endnum} 
    </select>
-	<select id="get_studyRecruit_total_theme"  parameterType="String" resultType="integer">
+    <select id="get_studyRecruit_total_theme"  parameterType="String" resultType="integer">
       select count(*) from study_recruit where study_recruit_directory like '%'||#{theme}||'%'
    </select>
    <select id="get_studyRecruit_total_title"  parameterType="String" resultType="integer">
@@ -369,34 +370,34 @@
    <delete id="study_bbsdel" parameterType="int"> 
       delete from study_bbs where study_bbsidx=#{study_bbsidx} 
    </delete>
-	<delete id="study_recruit_del" parameterType="map"> 
-		delete from study_recruit where stu_idx=#{stu_idx} and study_recruitidx=#{study_recruitidx} 
-	</delete>
-	<delete id="study_req_del" parameterType="map"> 
-		delete from study_req where study_recruitidx=#{study_recruitidx} 
-	</delete>
-	<update id="study_recruit_close" parameterType="map"> 
-		update study_recruit set study_recruit_situ=0 where study_recruitidx=#{study_recruitidx} and stu_idx=#{stu_idx} 
-	</update>
-	<update id="study_recruit_accept" parameterType="map"> 
-		update study_req set study_req_accept=1 where stu_idx=#{stu_idx} and study_recruitidx=#{study_recruitidx} 
-	</update>
-	<update id="study_recruit_cancle" parameterType="map"> 
-		update study_req set study_req_accept=2 where stu_idx=#{stu_idx} and study_recruitidx=#{study_recruitidx} 
-	</update>
-	<update id="study_leaderchange" parameterType="gyum_02.study.model.leaderStudyDTO">
-		update study_leader set study_leader=#{study_leader} where study_idx=#{study_idx}		
-	</update>
-	<update id="study_seconchange" parameterType="gyum_02.study.model.leaderStudyDTO">
-		update study_leader set study_seconleader=#{study_seconleader} where study_idx=#{study_idx}
-	</update>
-	<update id="rcs_close" parameterType="int">
-		update study_recruit set study_recruit_situ=0 where study_recruitidx=#{study_recruitidx}
-	</update>
-	<select id="get_study_idx" parameterType="gyum_02.study.model.createStudyDTO" resultType="int">
-		select study_idx from study where study_subject=#{study_subject} and study_content=#{study_content} and study_id=#{study_id} and study_maxnum=#{study_maxnum} and study_directory=#{study_directory} and study_lastday=#{study_lastday} and study_public=#{study_public}
-	</select>
-	<delete id="study_req_del2" parameterType="int">
-		delete study_req where study_recruitidx=#{study_recruitidx}
-	</delete>
+    <delete id="study_recruit_del" parameterType="map"> 
+        delete from study_recruit where stu_idx=#{stu_idx} and study_recruitidx=#{study_recruitidx} 
+    </delete>
+    <delete id="study_req_del" parameterType="map"> 
+        delete from study_req where study_recruitidx=#{study_recruitidx} 
+    </delete>
+    <update id="study_recruit_close" parameterType="map"> 
+        update study_recruit set study_recruit_situ=0 where study_recruitidx=#{study_recruitidx} and stu_idx=#{stu_idx} 
+    </update>
+    <update id="study_recruit_accept" parameterType="map"> 
+        update study_req set study_req_accept=1 where stu_idx=#{stu_idx} and study_recruitidx=#{study_recruitidx} 
+    </update>
+    <update id="study_recruit_cancle" parameterType="map"> 
+        update study_req set study_req_accept=2 where stu_idx=#{stu_idx} and study_recruitidx=#{study_recruitidx} 
+    </update>
+    <update id="study_leaderchange" parameterType="gyum_02.study.model.leaderStudyDTO">
+        update study_leader set study_leader=#{study_leader} where study_idx=#{study_idx}        
+    </update>
+    <update id="study_seconchange" parameterType="gyum_02.study.model.leaderStudyDTO">
+        update study_leader set study_seconleader=#{study_seconleader} where study_idx=#{study_idx}
+    </update>
+    <update id="rcs_close" parameterType="int">
+        update study_recruit set study_recruit_situ=0 where study_recruitidx=#{study_recruitidx}
+    </update>
+    <select id="get_study_idx" parameterType="gyum_02.study.model.createStudyDTO" resultType="int">
+        select study_idx from study where study_subject=#{study_subject} and study_content=#{study_content} and study_id=#{study_id} and study_maxnum=#{study_maxnum} and study_directory=#{study_directory} and study_lastday=#{study_lastday} and study_public=#{study_public}
+    </select>
+    <delete id="study_req_del2" parameterType="int">
+        delete study_req where study_recruitidx=#{study_recruitidx}
+    </delete>
 </mapper>
